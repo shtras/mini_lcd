@@ -1,8 +1,0 @@
-[submodule "hagl_hal"]
-	path = hagl_hal
-	url = git@github.com:shtras/hagl_pico_mipi.git
-	branch = multiple_backends
-[submodule "hagl"]
-	path = hagl
-	url = git@github.com:shtras/hagl.git
-	branch = multiple_backends
