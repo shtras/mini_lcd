@@ -2,7 +2,7 @@
 
 MIT License
 
-Copyright (c) 2019-2023 Mika Tuupola
+Copyright (c) 2018-2023 Mika Tuupola
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,33 +24,20 @@ SOFTWARE.
 
 -cut-
 
-This file is part of the Raspberry Pi Pico MIPI DCS backend for the HAGL
-graphics library: https://github.com/tuupola/hagl_pico_mipi
+This file is part of the HAGL graphics library:
+https://github.com/tuupola/hagl
+
 
 SPDX-License-Identifier: MIT
-
 */
 
-#ifndef _MIPI_DISPLAY_H
-#define _MIPI_DISPLAY_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <stdint.h>
-#include <stddef.h>
 
-#include "hagl_hal.h"
+#include "hagl/backend.h"
+#include "rgb565.h"
+#include "Display.h"
 
-void mipi_display_init(hagl_backend_t *backend);
-size_t mipi_display_write_xywh(hagl_backend_t *backend,uint16_t x1, uint16_t y1, uint16_t w, uint16_t h, uint8_t *buffer);
-size_t mipi_display_write_xy(hagl_backend_t *backend,uint16_t x1, uint16_t y1, uint8_t *buffer);
-size_t mipi_display_fill_xywh(hagl_backend_t *backend,uint16_t x1, uint16_t y1, uint16_t w, uint16_t h, void *color);
-void mipi_display_ioctl(hagl_backend_t *backend,uint8_t command, uint8_t *data, size_t size);
-void mipi_display_close(hagl_backend_t *backend);
-
-#ifdef __cplusplus
+hagl_color_t hagl_color(Display& display, uint8_t r, uint8_t g, uint8_t b)
+{
+    return rgb565(r, g, b);
 }
-#endif
-#endif /* _MIPI_DISPLAY_H */

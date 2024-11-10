@@ -2,7 +2,7 @@
 
 MIT License
 
-Copyright (c) 2021-2023 Mika Tuupola
+Copyright (c) 2019-2023 Mika Tuupola
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,23 +30,21 @@ graphics library: https://github.com/tuupola/hagl_pico_mipi
 SPDX-License-Identifier: MIT
 
 */
-#include <time.h>
-#include <sys/times.h>
-#include <pico/stdlib.h>
 
-clock_t
-_times(struct tms *buffer)
-{
-    /* Should be a 100Hz tick. Probably because by default arm libgloss */
-    /* assumes usage of SWI_Clock which is in centiseconds. */
-    clock_t timeval =  time_us_64() / 10000;
+#ifndef _MIPI_DISPLAY_H
+#define _MIPI_DISPLAY_H
 
-    if (buffer) {
-        buffer->tms_utime  = timeval;
-        buffer->tms_stime  = 0;
-        buffer->tms_cutime = 0;
-        buffer->tms_cstime = 0;
-    }
 
-    return timeval;
-};
+#include <stdint.h>
+#include <stddef.h>
+
+#include "hagl_hal.h"
+
+void mipi_display_init(hagl_backend_t *backend);
+size_t mipi_display_write_xywh(hagl_backend_t *backend,uint16_t x1, uint16_t y1, uint16_t w, uint16_t h, uint8_t *buffer);
+size_t mipi_display_write_xy(hagl_backend_t *backend,uint16_t x1, uint16_t y1, uint8_t *buffer);
+size_t mipi_display_fill_xywh(hagl_backend_t *backend,uint16_t x1, uint16_t y1, uint16_t w, uint16_t h, void *color);
+void mipi_display_ioctl(hagl_backend_t *backend,uint8_t command, uint8_t *data, size_t size);
+void mipi_display_close(hagl_backend_t *backend);
+
+#endif /* _MIPI_DISPLAY_H */

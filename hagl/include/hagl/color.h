@@ -38,23 +38,18 @@ SPDX-License-Identifier: MIT
 
 #include <hagl_hal_color.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-struct hagl_backend_t;
+
+class Display;
 /**
  * Convert RGB to color
  *
  * Returns color type  defined by the HAL. Most often it is an
  * uint16_t RGB565 color.
  *
- * @param surface
+ * @param display
  * @return color
  */
-hagl_color_t hagl_color(hagl_backend_t* surface, uint8_t r, uint8_t g, uint8_t b);
+hagl_color_t hagl_color(Display& display, uint8_t r, uint8_t g, uint8_t b);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
 
 #endif /* _HAGL_COLOR_H */

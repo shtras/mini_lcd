@@ -32,39 +32,44 @@ SPDX-License-Identifier: MIT
 
 */
 
-#include "hagl/line.h"
-#include "hagl/backend.h"
+#include <stdint.h>
+
+#include "Display.h"
+
 #include "hagl/color.h"
+#include "hagl/backend.h"
 
-void hagl_draw_vline_xyh(
-    hagl_backend_t* surface, int16_t x0, int16_t y0, uint16_t h, hagl_color_t color)
+void hagl_put_pixel(Display& display, int16_t x0, int16_t y0, hagl_color_t color)
 {
-    if (surface->vline) {
-        int16_t height = h;
-
-        /* x0 or y0 is over the edge, nothing to do. */
-        if ((x0 > surface->clip.x1) || (x0 < surface->clip.x0) || (y0 > surface->clip.y1)) {
-            return;
-        }
-
-        /* y0 is top of clip window, ignore start part. */
-        if (y0 < surface->clip.y0) {
-            height = height + y0;
-            y0 = surface->clip.y0;
-        }
-
-        /* Everything outside clip window, nothing to do. */
-        if (height <= 0) {
-            return;
-        }
-
-        /* Cut anything going over right edge. */
-        if (((y0 + height) > surface->clip.y1)) {
-            height = height - (y0 + height - 1 - surface->clip.y1);
-        }
-
-        surface->vline(surface, x0, y0, height, color);
-    } else {
-        hagl_draw_line(surface, x0, y0, x0, y0 + h - 1, color);
+    /* x0 or y0 is before the edge, nothing to do. */
+    if ((x0 < display.clip.x0) || (y0 < display.clip.y0)) {
+        return;
     }
+
+    /* x0 or y0 is after the edge, nothing to do. */
+    if ((x0 > display.clip.x1) || (y0 > display.clip.y1)) {
+        return;
+    }
+
+    /* If still in bounds set the pixel. */
+    display.put_pixel(x0, y0, color);
+}
+
+hagl_color_t hagl_get_pixel(Display& display, int16_t x0, int16_t y0)
+{
+    /* x0 or y0 is before the edge, nothing to do. */
+    if ((x0 < display.clip.x0) || (y0 < display.clip.y0)) {
+        return hagl_color(display, 0, 0, 0);
+    }
+
+    /* x0 or y0 is after the edge, nothing to do. */
+    if ((x0 > display.clip.x1) || (y0 > display.clip.y1)) {
+        return hagl_color(display, 0, 0, 0);
+    }
+
+    //if (display.get_pixel) {
+    //    return display.get_pixel(display, x0, y0);
+    //}
+
+    return hagl_color(display, 0, 0, 0);
 }

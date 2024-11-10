@@ -35,9 +35,7 @@ SPDX-License-Identifier: MIT
 #ifndef _RGB888_H
 #define _RGB888_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+
 
 typedef struct {
     uint8_t r;
@@ -66,8 +64,5 @@ static inline int max(int a, int b)
     return b;
 }
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
 
 #endif /* _RGB888_H */

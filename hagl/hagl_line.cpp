@@ -32,41 +32,53 @@ SPDX-License-Identifier: MIT
 
 */
 
+#include <stdbool.h>
+
 #include "hagl/color.h"
-#include "hagl/line.h"
 #include "hagl/backend.h"
-extern "C" {
+#include "hagl/line.h"
+#include "hagl/clip.h"
+#include "hagl.h"
+#include "Display.h"
 
-void hagl_draw_hline_xyw(
-    hagl_backend_t* surface, int16_t x0, int16_t y0, uint16_t w, hagl_color_t color)
+void hagl_draw_line(
+    Display& display, int16_t x0, int16_t y0, int16_t x1, int16_t y1, hagl_color_t color)
 {
-    if (surface->hline) {
-        int16_t width = w;
-
-        /* x0 or y0 is over the edge, nothing to do. */
-        if ((x0 > surface->clip.x1) || (y0 > surface->clip.y1) || (y0 < surface->clip.y0)) {
-            return;
-        }
-
-        /* x0 is left of clip window, ignore start part. */
-        if (x0 < surface->clip.x0) {
-            width = width + x0;
-            x0 = surface->clip.x0;
-        }
-
-        /* Everything outside clip window, nothing to do. */
-        if (width <= 0) {
-            return;
-        }
-
-        /* Cut anything going over right edge of clip window. */
-        if (((x0 + width) > surface->clip.x1)) {
-            width = width - (x0 + width - 1 - surface->clip.x1);
-        }
-
-        surface->hline(surface, x0, y0, width, color);
-    } else {
-        hagl_draw_line(surface, x0, y0, x0 + w - 1, y0, color);
+    /* Clip coordinates to fit clip window. */
+    if (false == hagl_clip_line(&x0, &y0, &x1, &y1, display.clip)) {
+        return;
     }
-}
+
+    int16_t dx;
+    int16_t sx;
+    int16_t dy;
+    int16_t sy;
+    int16_t err;
+    int16_t e2;
+
+    dx = ABS(x1 - x0);
+    sx = x0 < x1 ? 1 : -1;
+    dy = ABS(y1 - y0);
+    sy = y0 < y1 ? 1 : -1;
+    err = (dx > dy ? dx : -dy) / 2;
+
+    while (1) {
+        hagl_put_pixel(display, x0, y0, color);
+
+        if (x0 == x1 && y0 == y1) {
+            break;
+        };
+
+        e2 = err + err;
+
+        if (e2 > -dx) {
+            err -= dy;
+            x0 += sx;
+        }
+
+        if (e2 < dy) {
+            err += dx;
+            y0 += sy;
+        }
+    }
 }

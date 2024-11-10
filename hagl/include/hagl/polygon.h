@@ -40,9 +40,7 @@ SPDX-License-Identifier: MIT
 
 #include "hagl/color.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+class Display;
 
 /**
  * Draw a polygon
@@ -54,13 +52,13 @@ extern "C" {
  * int16_t vertices[10] = {x0, y0, x1, y1, x2, y2, x3, y3, x4, y4};
  * hagl_draw_polygon(5, vertices, color);
  *
- * @param surface
+ * @param display
  * @param amount number of vertices
  * @param vertices pointer to (an array) of vertices
  * @param color
  */
 void
-hagl_draw_polygon(hagl_backend_t *surface, int16_t amount, int16_t *vertices, hagl_color_t color);
+hagl_draw_polygon(Display& display, int16_t amount, int16_t *vertices, hagl_color_t color);
 
 /**
  * Draw a filled polygon
@@ -72,16 +70,13 @@ hagl_draw_polygon(hagl_backend_t *surface, int16_t amount, int16_t *vertices, ha
  * int16_t vertices[10] = {x0, y0, x1, y1, x2, y2, x3, y3, x4, y4};
  * hagl_draw_polygon(5, vertices, color);
  *
- * @param surface
+ * @param display
  * @param amount number of vertices
  * @param vertices pointer to (an array) of vertices
  * @param color
  */
 void
-hagl_fill_polygon(hagl_backend_t *surface, int16_t amount, int16_t *vertices, hagl_color_t color);
+hagl_fill_polygon(Display& display, int16_t amount, int16_t *vertices, hagl_color_t color);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
 
 #endif /* _HAGL_POLYGON_H */

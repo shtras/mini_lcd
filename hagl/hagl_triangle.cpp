@@ -35,40 +35,18 @@ SPDX-License-Identifier: MIT
 #include <stdint.h>
 
 #include "hagl/color.h"
-#include "hagl/backend.h"
-extern "C" {
-void hagl_put_pixel(hagl_backend_t* surface, int16_t x0, int16_t y0, hagl_color_t color)
+#include "hagl/polygon.h"
+
+void
+hagl_draw_triangle(Display& display, int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, hagl_color_t color)
 {
-    /* x0 or y0 is before the edge, nothing to do. */
-    if ((x0 < surface->clip.x0) || (y0 < surface->clip.y0)) {
-        return;
-    }
+    int16_t vertices[6] = {x0, y0, x1, y1, x2, y2};
+    hagl_draw_polygon(display, 3, vertices, color);
+};
 
-    /* x0 or y0 is after the edge, nothing to do. */
-    if ((x0 > surface->clip.x1) || (y0 > surface->clip.y1)) {
-        return;
-    }
-
-    /* If still in bounds set the pixel. */
-    surface->put_pixel(surface, x0, y0, color);
-}
-
-hagl_color_t hagl_get_pixel(hagl_backend_t* surface, int16_t x0, int16_t y0)
+void
+hagl_fill_triangle(Display& display, int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, hagl_color_t color)
 {
-    /* x0 or y0 is before the edge, nothing to do. */
-    if ((x0 < surface->clip.x0) || (y0 < surface->clip.y0)) {
-        return hagl_color(surface, 0, 0, 0);
-    }
-
-    /* x0 or y0 is after the edge, nothing to do. */
-    if ((x0 > surface->clip.x1) || (y0 > surface->clip.y1)) {
-        return hagl_color(surface, 0, 0, 0);
-    }
-
-    if (surface->get_pixel) {
-        return surface->get_pixel(surface, x0, y0);
-    }
-
-    return hagl_color(surface, 0, 0, 0);
-}
+    int16_t vertices[6] = {x0, y0, x1, y1, x2, y2};
+    hagl_fill_polygon(display, 3, vertices, color);
 }

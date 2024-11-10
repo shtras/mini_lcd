@@ -39,9 +39,7 @@ SPDX-License-Identifier: MIT
 
 #include "hagl/color.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+
 
 /**
  * Draw a triangle
@@ -49,7 +47,7 @@ extern "C" {
  * Output will be clipped to the current clip window. Internally
  * uses hagl_draw_polygon() to draw the triangle.
  *
- * @param surface
+ * @param display
  * @param x0
  * @param y0
  * @param x1
@@ -59,7 +57,7 @@ extern "C" {
  * @param color
  */
 void
-hagl_draw_triangle(hagl_backend_t *surface, int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, hagl_color_t color);
+hagl_draw_triangle(Display& display, int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, hagl_color_t color);
 
 /**
  * Draw a filled triangle
@@ -67,7 +65,7 @@ hagl_draw_triangle(hagl_backend_t *surface, int16_t x0, int16_t y0, int16_t x1, 
  * Output will be clipped to the current clip window. Internally
  * uses hagl_fill_polygon() to draw the triangle.
  *
- * @param surface
+ * @param display
  * @param x0
  * @param y0
  * @param x1
@@ -77,10 +75,7 @@ hagl_draw_triangle(hagl_backend_t *surface, int16_t x0, int16_t y0, int16_t x1, 
  * @param color
  */
 void
-hagl_fill_triangle(hagl_backend_t *surface, int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, hagl_color_t color);
+hagl_fill_triangle(Display& display, int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, hagl_color_t color);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
 
 #endif /* _HAGL_TRIANGLE_H */

@@ -8,7 +8,6 @@ set(CMAKE_CXX_STANDARD 20)
 pico_sdk_init()
 
 add_subdirectory(hagl)
-add_subdirectory(hagl_hal)
 
 add_library(mini_lcd_compiler_flags INTERFACE)
 target_compile_features(mini_lcd_compiler_flags INTERFACE cxx_std_20)
@@ -21,7 +20,7 @@ add_executable(mini_lcd
 )
 
 # pull in common dependencies
-target_link_libraries(mini_lcd pico_stdlib hagl hagl_hal)
+target_link_libraries(mini_lcd pico_stdlib hagl)
 
 target_compile_definitions(mini_lcd PRIVATE
         HAGL_HAL_USE_SINGLE_BUFFER

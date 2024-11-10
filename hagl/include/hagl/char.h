@@ -40,9 +40,7 @@ SPDX-License-Identifier: MIT
 
 #include "hagl/color.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+
 
 /**
  * Draw a single character
@@ -52,7 +50,7 @@ extern "C" {
  *
  * https://github.com/tuupola/embedded-fonts
  *
- * @param surface
+ * @param display
  * @param code  unicode code point
  * @param x0
  * @param y0
@@ -61,7 +59,7 @@ extern "C" {
  * @return width of the drawn character
  */
 uint8_t
-hagl_put_char(hagl_backend_t *surface, wchar_t code, int16_t x0, int16_t y0, hagl_color_t color, const unsigned char *font);
+hagl_put_char(Display& display, wchar_t code, int16_t x0, int16_t y0, hagl_color_t color, const unsigned char *font);
 
 /**
  * Draw a string
@@ -71,7 +69,7 @@ hagl_put_char(hagl_backend_t *surface, wchar_t code, int16_t x0, int16_t y0, hag
  *
  * https://github.com/tuupola/embedded-fonts
  *
- * @param surface
+ * @param display
  * @param str pointer to an wide char string
  * @param x0
  * @param y0
@@ -80,7 +78,7 @@ hagl_put_char(hagl_backend_t *surface, wchar_t code, int16_t x0, int16_t y0, hag
  * @return width of the drawn string
  */
 uint16_t
-hagl_put_text(hagl_backend_t *surface, const wchar_t *str, int16_t x0, int16_t y0, hagl_color_t color, const unsigned char *font);
+hagl_put_text(Display& display, const wchar_t *str, int16_t x0, int16_t y0, hagl_color_t color, const unsigned char *font);
 
 /**
  * Extract a glyph into a bitmap
@@ -88,7 +86,7 @@ hagl_put_text(hagl_backend_t *surface, const wchar_t *str, int16_t x0, int16_t y
  * This can be used for example for extracting game sprites from fontsets
  * such as UNSCII.
  *
- * @param surface
+ * @param display
  * @param code Unicode code point
  * @param color
  * @param bitmap Pointer to a bitmap
@@ -96,11 +94,8 @@ hagl_put_text(hagl_backend_t *surface, const wchar_t *str, int16_t x0, int16_t y
  * @return Width of the drawn string
  */
 uint8_t
-hagl_get_glyph(hagl_backend_t *surface, wchar_t code, hagl_color_t color, hagl_bitmap_t *bitmap, const uint8_t *font);
+hagl_get_glyph(Display& display, wchar_t code, hagl_color_t color, hagl_bitmap_t *bitmap, const uint8_t *font);
 
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
 
 #endif /* _HAGL_CHAR_H */

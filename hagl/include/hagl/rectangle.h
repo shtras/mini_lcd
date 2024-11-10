@@ -40,16 +40,14 @@ SPDX-License-Identifier: MIT
 
 #include "hagl/color.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+
 
 /**
  * Draw a rectangle
  *
  * Output will be clipped to the current clip window.
  *
- * @param surface
+ * @param display
  * @param x0
  * @param y0
  * @param x1
@@ -57,14 +55,14 @@ extern "C" {
  * @param color
  */
 void hagl_draw_rectangle_xyxy(
-    hagl_backend_t *surface, int16_t x0, int16_t y0, int16_t x1, int16_t y1, hagl_color_t color);
+    Display& display, int16_t x0, int16_t y0, int16_t x1, int16_t y1, hagl_color_t color);
 
 /**
  * Draw a rectangle
  *
  * Output will be clipped to the current clip window.
  *
- * @param surface
+ * @param display
  * @param x0
  * @param y0
  * @param x1
@@ -72,9 +70,9 @@ void hagl_draw_rectangle_xyxy(
  * @param color
  */
 static inline void hagl_draw_rectangle(
-    hagl_backend_t *surface, int16_t x0, int16_t y0, int16_t x1, int16_t y1, hagl_color_t color)
+    Display& display, int16_t x0, int16_t y0, int16_t x1, int16_t y1, hagl_color_t color)
 {
-    hagl_draw_rectangle_xyxy(surface, x0, y0, x1, y1, color);
+    hagl_draw_rectangle_xyxy(display, x0, y0, x1, y1, color);
 }
 
 /**
@@ -82,17 +80,17 @@ static inline void hagl_draw_rectangle(
  *
  * Output will be clipped to the current clip window.
  *
- * @param surface
+ * @param display
  * @param x0
  * @param y0
  * @param width
  * @param height
  * @param color
  */
-static inline void hagl_draw_rectangle_xywh(hagl_backend_t *surface, int16_t x0, int16_t y0,
+static inline void hagl_draw_rectangle_xywh(Display& display, int16_t x0, int16_t y0,
     uint16_t width, uint16_t height, hagl_color_t color)
 {
-    hagl_draw_rectangle_xyxy(surface, x0, y0, x0 + width - 1, y0 + height - 1, color);
+    hagl_draw_rectangle_xyxy(display, x0, y0, x0 + width - 1, y0 + height - 1, color);
 }
 
 /**
@@ -100,7 +98,7 @@ static inline void hagl_draw_rectangle_xywh(hagl_backend_t *surface, int16_t x0,
  *
  * Output will be clipped to the current clip window.
  *
- * @param surface
+ * @param display
  * @param x0
  * @param y0
  * @param x1
@@ -108,24 +106,25 @@ static inline void hagl_draw_rectangle_xywh(hagl_backend_t *surface, int16_t x0,
  * @param color
  */
 void hagl_fill_rectangle_xyxy(
-    hagl_backend_t *surface, int16_t x0, int16_t y0, int16_t x1, int16_t y1, hagl_color_t color);
+    Display& display, int16_t x0, int16_t y0, int16_t x1, int16_t y1, hagl_color_t color);
 
 /**
  * Draw a filled rectangle
  *
  * Output will be clipped to the current clip window.
  *
- * @param surface
+ * @param display
  * @param x0
  * @param y0
  * @param x1
  * @param y1
  * @param color
  */
+
 static inline void hagl_fill_rectangle(
-    hagl_backend_t *surface, int16_t x0, int16_t y0, int16_t x1, int16_t y1, hagl_color_t color)
+    Display& display, int16_t x0, int16_t y0, int16_t x1, int16_t y1, hagl_color_t color)
 {
-    hagl_fill_rectangle_xyxy(surface, x0, y0, x1, y1, color);
+    hagl_fill_rectangle_xyxy(display, x0, y0, x1, y1, color);
 }
 
 /**
@@ -133,17 +132,17 @@ static inline void hagl_fill_rectangle(
  *
  * Output will be clipped to the current clip window.
  *
- * @param surface
+ * @param display
  * @param x0
  * @param y0
  * @param width
  * @param height
  * @param color
  */
-static inline void hagl_fill_rectangle_xywh(hagl_backend_t *surface, int16_t x0, int16_t y0,
+static inline void hagl_fill_rectangle_xywh(Display& display, int16_t x0, int16_t y0,
     uint16_t width, uint16_t height, hagl_color_t color)
 {
-    hagl_fill_rectangle_xyxy(surface, x0, y0, x0 + width - 1, y0 + height - 1, color);
+    hagl_fill_rectangle_xyxy(display, x0, y0, x0 + width - 1, y0 + height - 1, color);
 };
 
 /**
@@ -151,7 +150,7 @@ static inline void hagl_fill_rectangle_xywh(hagl_backend_t *surface, int16_t x0,
  *
  * Output will be clipped to the current clip window.
  *
- * @param surface
+ * @param display
  * @param x0
  * @param y0
  * @param x0
@@ -159,7 +158,7 @@ static inline void hagl_fill_rectangle_xywh(hagl_backend_t *surface, int16_t x0,
  * @param r corner radius
  * @param color
  */
-void hagl_draw_rounded_rectangle_xyxy(hagl_backend_t *surface, int16_t x0, int16_t y0, int16_t x1,
+void hagl_draw_rounded_rectangle_xyxy(Display& display, int16_t x0, int16_t y0, int16_t x1,
     int16_t y1, int16_t r, hagl_color_t color);
 
 /**
@@ -167,7 +166,7 @@ void hagl_draw_rounded_rectangle_xyxy(hagl_backend_t *surface, int16_t x0, int16
  *
  * Output will be clipped to the current clip window.
  *
- * @param surface
+ * @param display
  * @param x0
  * @param y0
  * @param x0
@@ -175,10 +174,10 @@ void hagl_draw_rounded_rectangle_xyxy(hagl_backend_t *surface, int16_t x0, int16
  * @param r corner radius
  * @param color
  */
-static inline void hagl_draw_rounded_rectangle(hagl_backend_t *surface, int16_t x0, int16_t y0,
+static inline void hagl_draw_rounded_rectangle(Display& display, int16_t x0, int16_t y0,
     int16_t x1, int16_t y1, int16_t r, hagl_color_t color)
 {
-    hagl_draw_rounded_rectangle_xyxy(surface, x0, y0, x1, y1, r, color);
+    hagl_draw_rounded_rectangle_xyxy(display, x0, y0, x1, y1, r, color);
 }
 
 /**
@@ -186,7 +185,7 @@ static inline void hagl_draw_rounded_rectangle(hagl_backend_t *surface, int16_t 
  *
  * Output will be clipped to the current clip window.
  *
- * @param surface
+ * @param display
  * @param x0
  * @param y0
  * @param width
@@ -194,10 +193,10 @@ static inline void hagl_draw_rounded_rectangle(hagl_backend_t *surface, int16_t 
  * @param r corner radius
  * @param color
  */
-static inline void hagl_draw_rounded_rectangle_xywh(hagl_backend_t *surface, int16_t x0, int16_t y0,
+static inline void hagl_draw_rounded_rectangle_xywh(Display& display, int16_t x0, int16_t y0,
     uint16_t width, uint16_t height, int16_t r, hagl_color_t color)
 {
-    hagl_draw_rounded_rectangle_xyxy(surface, x0, y0, x0 + width - 1, y0 + height - 1, r, color);
+    hagl_draw_rounded_rectangle_xyxy(display, x0, y0, x0 + width - 1, y0 + height - 1, r, color);
 }
 
 /**
@@ -205,7 +204,7 @@ static inline void hagl_draw_rounded_rectangle_xywh(hagl_backend_t *surface, int
  *
  * Output will be clipped to the current clip window.
  *
- * @param surface
+ * @param display
  * @param x0
  * @param y0
  * @param x1
@@ -213,7 +212,7 @@ static inline void hagl_draw_rounded_rectangle_xywh(hagl_backend_t *surface, int
  * @param r corner radius
  * @param color
  */
-void hagl_fill_rounded_rectangle_xyxy(hagl_backend_t *surface, int16_t x0, int16_t y0, int16_t x1,
+void hagl_fill_rounded_rectangle_xyxy(Display& display, int16_t x0, int16_t y0, int16_t x1,
     int16_t y1, int16_t r, hagl_color_t color);
 
 /**
@@ -221,7 +220,7 @@ void hagl_fill_rounded_rectangle_xyxy(hagl_backend_t *surface, int16_t x0, int16
  *
  * Output will be clipped to the current clip window.
  *
- * @param surface
+ * @param display
  * @param x0
  * @param y0
  * @param x0
@@ -229,10 +228,10 @@ void hagl_fill_rounded_rectangle_xyxy(hagl_backend_t *surface, int16_t x0, int16
  * @param r corner radius
  * @param color
  */
-static inline void hagl_fill_rounded_rectangle(hagl_backend_t *surface, int16_t x0, int16_t y0,
+static inline void hagl_fill_rounded_rectangle(Display& display, int16_t x0, int16_t y0,
     int16_t x1, int16_t y1, int16_t r, hagl_color_t color)
 {
-    hagl_fill_rounded_rectangle_xyxy(surface, x0, y0, x1, y1, r, color);
+    hagl_fill_rounded_rectangle_xyxy(display, x0, y0, x1, y1, r, color);
 }
 
 /**
@@ -240,7 +239,7 @@ static inline void hagl_fill_rounded_rectangle(hagl_backend_t *surface, int16_t 
  *
  * Output will be clipped to the current clip window.
  *
- * @param surface
+ * @param display
  * @param x0
  * @param y0
  * @param width
@@ -248,14 +247,11 @@ static inline void hagl_fill_rounded_rectangle(hagl_backend_t *surface, int16_t 
  * @param r corner radius
  * @param color
  */
-static inline void hagl_fill_rounded_rectangle_xywh(hagl_backend_t *surface, int16_t x0, int16_t y0,
+static inline void hagl_fill_rounded_rectangle_xywh(Display& display, int16_t x0, int16_t y0,
     uint16_t width, uint16_t height, int16_t r, hagl_color_t color)
 {
-    hagl_fill_rounded_rectangle_xyxy(surface, x0, y0, x0 + width - 1, y0 + height - 1, r, color);
+    hagl_fill_rounded_rectangle_xyxy(display, x0, y0, x0 + width - 1, y0 + height - 1, r, color);
 }
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
 
 #endif /* _HAGL_RECTANGLE_H */

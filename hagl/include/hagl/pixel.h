@@ -39,23 +39,21 @@ SPDX-License-Identifier: MIT
 #include <stdint.h>
 
 #include "hagl/color.h"
+#include "Display.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
 
 /**
  * Put a single pixel
  *
  * Output will be clipped to the current clip window.
  *
- * @param surface
+ * @param display
  * @param x0
  * @param y0
  * @param color
  */
-void
-hagl_put_pixel(hagl_backend_t *surface, int16_t x0, int16_t y0, hagl_color_t color);
+void hagl_put_pixel(Display& display, int16_t x0, int16_t y0, hagl_color_t color);
+void hagl_put_pixel(Display& display, int16_t x0, int16_t y0, hagl_color_t color);
 
 /**
  * Get a single pixel
@@ -63,16 +61,12 @@ hagl_put_pixel(hagl_backend_t *surface, int16_t x0, int16_t y0, hagl_color_t col
  * Input will be clipped to the current clip window. In case of
  * error or if HAL does not support this feature returns black.
  *
- * @param surface
+ * @param display
  * @param x0
  * @param y0
  * @return color at the given location
  */
-hagl_color_t
-hagl_get_pixel(hagl_backend_t *surface, int16_t x0, int16_t y0);
+hagl_color_t hagl_get_pixel(Display& display, int16_t x0, int16_t y0);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
 
 #endif /* _HAGL_PIXEL_H */

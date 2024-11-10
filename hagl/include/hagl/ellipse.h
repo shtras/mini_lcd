@@ -40,16 +40,14 @@ SPDX-License-Identifier: MIT
 
 #include "hagl/color.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+
 
 /**
  * Draw an ellipse
  *
  * Output will be clipped to the current clip window.
  *
- * @param surface
+ * @param display
  * @param x0 center X
  * @param y0 center Y
  * @param a vertical radius
@@ -57,14 +55,14 @@ extern "C" {
  * @param color
  */
 void
-hagl_draw_ellipse(hagl_backend_t *surface, int16_t x0, int16_t y0, int16_t a, int16_t b, hagl_color_t color);
+hagl_draw_ellipse(Display& display, int16_t x0, int16_t y0, int16_t a, int16_t b, hagl_color_t color);
 
 /**
  * Draw a filled ellipse
  *
  * Output will be clipped to the current clip window.
  *
- * @param surface
+ * @param display
  * @param x0 center X
  * @param y0 center Y
  * @param a vertical radius
@@ -72,10 +70,7 @@ hagl_draw_ellipse(hagl_backend_t *surface, int16_t x0, int16_t y0, int16_t a, in
  * @param color
  */
 void
-hagl_fill_ellipse(hagl_backend_t *surface, int16_t x0, int16_t y0, int16_t a, int16_t b, hagl_color_t color);
+hagl_fill_ellipse(Display& display, int16_t x0, int16_t y0, int16_t a, int16_t b, hagl_color_t color);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
 
 #endif /* _HAGL_ELLIPSE_H */

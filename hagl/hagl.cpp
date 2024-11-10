@@ -48,18 +48,18 @@ SPDX-License-Identifier: MIT
 
 #include "hagl.h"
 #include "hagl_hal.h"
+#include "Display.h"
 
-extern "C" {
-void hagl_clear(hagl_backend_t* surface)
+void hagl_clear(Display& display)
 {
-    uint16_t x0 = surface->clip.x0;
-    uint16_t y0 = surface->clip.y0;
-    uint16_t x1 = surface->clip.x1;
-    uint16_t y1 = surface->clip.y1;
+    uint16_t x0 = display.clip.x0;
+    uint16_t y0 = display.clip.y0;
+    uint16_t x1 = display.clip.x1;
+    uint16_t y1 = display.clip.y1;
 
-    hagl_set_clip(surface, 0, 0, surface->width - 1, surface->height - 1);
-    hagl_fill_rectangle(surface, 0, 0, surface->width - 1, surface->height - 1, 0x00);
-    hagl_set_clip(surface, x0, y0, x1, y1);
+    hagl_set_clip(display, 0, 0, display.width - 1, display.height - 1);
+    hagl_fill_rectangle(display, 0, 0, display.width - 1, display.height - 1, 0x00);
+    hagl_set_clip(display, x0, y0, x1, y1);
 }
 
 void hagl_init(
@@ -74,7 +74,7 @@ void hagl_init(
     backend->spi = spi;
 
     hagl_hal_init(backend);
-    hagl_set_clip(backend, 0, 0, backend->width - 1, backend->height - 1);
+    //hagl_set_clip(backend, 0, 0, backend->width - 1, backend->height - 1);
 };
 
 size_t hagl_flush(hagl_backend_t* backend)
@@ -91,4 +91,3 @@ void hagl_close(hagl_backend_t* backend)
         backend->close(backend);
     }
 };
-}

@@ -38,12 +38,8 @@ SPDX-License-Identifier: MIT
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
-#define HAGL_ERR_TJPGD           (100)
-struct hagl_backend_t;
+#define HAGL_ERR_TJPGD (100)
+class Display;
 /**
  * Load an image
  *
@@ -51,18 +47,13 @@ struct hagl_backend_t;
  * any scaling. Currently supports only baseline jpg images
  * (i.e. it does not support progressive jpg).
  *
- * @param surface
+ * @param display
  * @param x0
  * @param y0
  * @param x1
  * @param y1
  * @param color
  */
-uint32_t
-hagl_load_image(hagl_backend_t *surface, int16_t x0, int16_t y0, const char *filename);
-
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+uint32_t hagl_load_image(Display& display, int16_t x0, int16_t y0, const char* filename);
 
 #endif /* _HAGL_IMAGE_H */

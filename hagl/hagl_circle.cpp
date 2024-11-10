@@ -34,24 +34,26 @@ SPDX-License-Identifier: MIT
 
 #include <stdint.h>
 
+#include "Display.h"
+
 #include "hagl/color.h"
 #include "hagl/pixel.h"
 #include "hagl/hline.h"
-extern "C" {
-void hagl_draw_circle(hagl_backend_t *surface, int16_t xc, int16_t yc, int16_t r, hagl_color_t color)
+
+void hagl_draw_circle(Display& display, int16_t xc, int16_t yc, int16_t r, hagl_color_t color)
 {
     int16_t x = 0;
     int16_t y = r;
     int16_t d = 3 - 2 * r;
 
-    hagl_put_pixel(surface, xc + x, yc + y, color);
-    hagl_put_pixel(surface, xc - x, yc + y, color);
-    hagl_put_pixel(surface, xc + x, yc - y, color);
-    hagl_put_pixel(surface, xc - x, yc - y, color);
-    hagl_put_pixel(surface, xc + y, yc + x, color);
-    hagl_put_pixel(surface, xc - y, yc + x, color);
-    hagl_put_pixel(surface, xc + y, yc - x, color);
-    hagl_put_pixel(surface, xc - y, yc - x, color);
+    hagl_put_pixel(display, xc + x, yc + y, color);
+    hagl_put_pixel(display, xc - x, yc + y, color);
+    hagl_put_pixel(display, xc + x, yc - y, color);
+    hagl_put_pixel(display, xc - x, yc - y, color);
+    hagl_put_pixel(display, xc + y, yc + x, color);
+    hagl_put_pixel(display, xc - y, yc + x, color);
+    hagl_put_pixel(display, xc + y, yc - x, color);
+    hagl_put_pixel(display, xc - y, yc - x, color);
 
     while (y >= x) {
         if (d > 0) {
@@ -63,28 +65,27 @@ void hagl_draw_circle(hagl_backend_t *surface, int16_t xc, int16_t yc, int16_t r
             x++;
         }
 
-        hagl_put_pixel(surface, xc + x, yc + y, color);
-        hagl_put_pixel(surface, xc - x, yc + y, color);
-        hagl_put_pixel(surface, xc + x, yc - y, color);
-        hagl_put_pixel(surface, xc - x, yc - y, color);
-        hagl_put_pixel(surface, xc + y, yc + x, color);
-        hagl_put_pixel(surface, xc - y, yc + x, color);
-        hagl_put_pixel(surface, xc + y, yc - x, color);
-        hagl_put_pixel(surface, xc - y, yc - x, color);
+        hagl_put_pixel(display, xc + x, yc + y, color);
+        hagl_put_pixel(display, xc - x, yc + y, color);
+        hagl_put_pixel(display, xc + x, yc - y, color);
+        hagl_put_pixel(display, xc - x, yc - y, color);
+        hagl_put_pixel(display, xc + y, yc + x, color);
+        hagl_put_pixel(display, xc - y, yc + x, color);
+        hagl_put_pixel(display, xc + y, yc - x, color);
+        hagl_put_pixel(display, xc - y, yc - x, color);
     }
 }
-
-void hagl_fill_circle(hagl_backend_t *surface, int16_t x0, int16_t y0, int16_t r, hagl_color_t color)
+void hagl_fill_circle(Display& display, int16_t x0, int16_t y0, int16_t r, hagl_color_t color)
 {
     int16_t x = 0;
     int16_t y = r;
     int16_t d = 3 - 2 * r;
 
     while (y >= x) {
-        hagl_draw_hline(surface, x0 - x, y0 + y, x * 2, color);
-        hagl_draw_hline(surface, x0 - x, y0 - y, x * 2, color);
-        hagl_draw_hline(surface, x0 - y, y0 + x, y * 2, color);
-        hagl_draw_hline(surface, x0 - y, y0 - x, y * 2, color);
+        hagl_draw_hline(display, x0 - x, y0 + y, x * 2, color);
+        hagl_draw_hline(display, x0 - x, y0 - y, x * 2, color);
+        hagl_draw_hline(display, x0 - y, y0 + x, y * 2, color);
+        hagl_draw_hline(display, x0 - y, y0 - x, y * 2, color);
 
         if (d <= 0) {
             d = d + 4 * x + 6;
@@ -95,5 +96,4 @@ void hagl_fill_circle(hagl_backend_t *surface, int16_t x0, int16_t y0, int16_t r
             y--;
         }
     }
-}
 }

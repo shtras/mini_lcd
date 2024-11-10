@@ -57,10 +57,6 @@ SPDX-License-Identifier: MIT
 
 #include <hardware/spi.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-
 #define ABS(x) ((x) > 0 ? (x) : -(x))
 
 /* If you want to use bigger fonts than 6x9 you need to define this. */
@@ -76,10 +72,8 @@ void hagl_init(hagl_backend_t* backend, uint8_t scl, uint8_t sda, uint8_t dc, ui
 size_t hagl_flush(hagl_backend_t* backend);
 void hagl_close(hagl_backend_t* backend);
 
-void hagl_clear(hagl_backend_t* surface);
-
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
+class Display;
+void hagl_clear(Display& display);
+void hagl_clear(Display& display);
 
 #endif /* _HAGL_H */

@@ -1,3 +1,5 @@
+#include "Display.h"
+
 #include <hagl_hal.h>
 #include <hagl.h>
 #include <font6x9.h>
@@ -10,7 +12,7 @@
 #include <array>
 #include <sstream>
 
-void foo1(hagl_backend_t* display)
+void foo1(Display& display)
 {
     hagl_clear(display);
     int x = 5;
@@ -32,33 +34,6 @@ void foo1(hagl_backend_t* display)
 static void mipi_display_spi_master_init()
 {
     hagl_hal_debug("%s\n", "Initialising SPI.");
-
-    gpio_set_function(6, GPIO_FUNC_SIO);
-    gpio_set_dir(6, GPIO_OUT);
-
-    gpio_set_function(7, GPIO_FUNC_SIO);
-    gpio_set_dir(7, GPIO_OUT);
-
-    gpio_set_function(14, GPIO_FUNC_SIO);
-    gpio_set_dir(14, GPIO_OUT);
-
-    gpio_set_function(13, GPIO_FUNC_SIO);
-    gpio_set_dir(13, GPIO_OUT);
-
-    gpio_set_function(0, GPIO_FUNC_SIO);
-    gpio_set_dir(0, GPIO_OUT);
-
-    gpio_set_function(1, GPIO_FUNC_SIO);
-    gpio_set_dir(1, GPIO_OUT);
-
-    gpio_set_function(10, GPIO_FUNC_SPI);
-    gpio_set_function(11, GPIO_FUNC_SPI);
-
-    /* Set CS high to ignore any traffic on SPI bus. */
-    gpio_put(7, 1);
-    gpio_put(13, 1);
-    gpio_put(1, 1);
-
     spi_init(spi0, MIPI_DISPLAY_SPI_CLOCK_SPEED_HZ);
     spi_set_format(spi0, 8, SPI_CPOL_0, SPI_CPHA_0, SPI_MSB_FIRST);
 
@@ -66,13 +41,13 @@ static void mipi_display_spi_master_init()
     spi_set_format(spi1, 8, SPI_CPOL_0, SPI_CPHA_0, SPI_MSB_FIRST);
 }
 
-void dots(hagl_backend_t* display)
+void dots(Display& display)
 {
-    hagl_draw_circle(display, rand() % display->width, rand() % display->height, 2,
+    hagl_draw_circle(display, rand() % display.width, rand() % display.height, 2,
         hagl_color(display, rand() % 255, rand() % 255, rand() % 255));
 }
 
-void squares(hagl_backend_t* display)
+void squares(Display& display)
 {
     static int x = 0;
     static int y = 0;
@@ -84,25 +59,25 @@ void squares(hagl_backend_t* display)
     x += dx;
     y += dy;
 
-    if (x >= display->width - 10 || x <= 0) {
+    if (x >= display.width - 10 || x <= 0) {
         dx = -dx;
     }
-    if (y >= display->height - 10 || y <= 0) {
+    if (y >= display.height - 10 || y <= 0) {
         dy = -dy;
     }
 
     hagl_fill_rounded_rectangle(display, x, y, x + 10, y + 10, 5, hagl_color(display, 0, 255, 255));
 }
 
-void circles(hagl_backend_t* display)
+void circles(Display& display)
 {
     static int r = 2;
     static bool expanding = true;
     hagl_draw_circle(
-        display, display->width / 2, display->height / 2, r, hagl_color(display, 0, 0, 0));
+        display, display.width / 2, display.height / 2, r, hagl_color(display, 0, 0, 0));
     if (expanding) {
         r++;
-        if (r > display->width / 2) {
+        if (r > display.width / 2) {
             expanding = false;
         }
     } else {
@@ -112,44 +87,159 @@ void circles(hagl_backend_t* display)
         }
     }
     hagl_draw_circle(
-        display, display->width / 2, display->height / 2, r, hagl_color(display, 255, 255, 0));
+        display, display.width / 2, display.height / 2, r, hagl_color(display, 255, 255, 0));
+}
+
+inline uint64_t micros()
+{
+    return time_us_64();
+}
+
+inline uint64_t millis()
+{
+    return micros() / 1000ULL;
+}
+
+void texts(Display& display)
+{
+    std::array<std::wstring, 15> strs = {
+        L"MOV AX, 0x0A      ; Load value 0x0A into AX register",
+        L"ADD AX, 0x05      ; Add value 0x05 to AX",
+        L"CMP AX, 0x0F      ; Compare AX with 0x0F",
+        L"JLE SHORT label1  ; Jump to label1 if AX is less than or equal to 0x0F",
+        L"MOV BX, AX        ; Move value from AX to BX",
+        L"SHL BX, 1         ; Shift BX left by 1 bit",
+        L"SUB BX, 0x03      ; Subtract 0x03 from BX",
+        L"label1:",
+        L"MOV CX, BX        ; Copy BX to CX",
+        L"XOR CX, 0xFF      ; Perform XOR with value 0xFF",
+        L"INC CX            ; Increment CX by 1",
+        L"JMP SHORT label2  ; Unconditional jump to label2",
+        L"label2:",
+        L"NOP               ; No operation (do nothing)",
+        L"HLT               ; Halt the processor",
+    };
+
+    static int start_idx = 0;
+    static uint64_t last_time = millis();
+    if (millis() - last_time > 300) {
+        last_time = millis();
+        start_idx = (start_idx + 1) % strs.size();
+        hagl_clear(display);
+
+        for (int i = 0; i < static_cast<int>(strs.size()); ++i) {
+            int idx = (start_idx + i) % strs.size();
+            hagl_put_text(display, strs[idx].c_str(), 1, 1 + i * 10,
+                hagl_color(display, 255, 100, 0), font6x9);
+        }
+    }
+}
+
+bool checkingDirection = false;
+
+void irq_callback(uint gpio, uint32_t event) {
+    std::cout << "GPIO " << gpio << " event " << event << " ";
+    if (event & GPIO_IRQ_EDGE_RISE) {
+        std::cout << "Rise ";
+    }
+    if (event & GPIO_IRQ_EDGE_FALL) {
+        std::cout << "Fall ";
+    } 
+    if (event & GPIO_IRQ_LEVEL_HIGH) {
+        std::cout << "High ";
+    }
+    if (event & GPIO_IRQ_LEVEL_LOW) {
+        std::cout << "Low ";
+    }
+    std::cout << "\n";
+    if (event == GPIO_IRQ_EDGE_RISE) {
+        checkingDirection = false;
+    }
+    if (event == GPIO_IRQ_EDGE_FALL) {
+        if (checkingDirection) {
+            if (gpio == 15) {
+                std::cout << "Right\n";
+            } else {
+                std::cout << "Left\n";
+            }
+        }
+        checkingDirection = true;
+    }
 }
 
 int main()
 {
     stdio_init_all();
-    std::array<hagl_backend_t, 3> displays;
+    gpio_set_dir(15, GPIO_IN);
+    gpio_set_dir(14, GPIO_IN);
+    gpio_pull_up(14);
+    gpio_pull_up(15);
+
+    gpio_set_irq_enabled_with_callback(15, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true, &irq_callback);
+    gpio_set_irq_enabled_with_callback(14, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true, &irq_callback);
+
+    std::array<hagl_backend_t, 2> displays;
+
+    Display display(10, 11, 3, 2, spi1);
+    Display display1(10, 11, 6, 7, spi1);
+    //hagl_init(&displays[2], 10, 11, 0, 1, spi1);
+    Display display2(10, 11, 0, 1, spi1);
+    Display display3(10, 11, 17, 16, spi1);
 
     mipi_display_spi_master_init();
 
-    hagl_init(&displays[0], 10, 11, 14, 13, spi1);
-    hagl_init(&displays[1], 10, 11, 6, 7, spi1);
-    hagl_init(&displays[2], 10, 11, 0, 1, spi1);
+    display.init();
+    display1.init();
+    display2.init();
+    display3.init();
 
-    std::array<uint16_t, 4> colors = {hagl_color(&displays[0], 255, 0, 0),
-        hagl_color(&displays[0], 0, 255, 0), hagl_color(&displays[0], 0, 0, 255),
-        hagl_color(&displays[0], 255, 255, 255)};
+    std::array<uint16_t, 4> colors = {hagl_color(display, 255, 0, 0),
+        hagl_color(display, 0, 255, 0), hagl_color(display, 0, 0, 255),
+        hagl_color(display, 255, 255, 255)};
 
     int32_t iteration = 0;
 
-    hagl_clear(&displays[0]);
-    hagl_clear(&displays[1]);
-    hagl_clear(&displays[2]);
+    hagl_clear(display);
+    hagl_clear(display1);
+    hagl_clear(display2);
+    hagl_clear(display3);
+    //auto res = hagl_load_image(display, 0, 0, "/sd/test.jpg");
+
+    if (0) {
+        std::wstringstream ss;
+        auto f = fopen("/test.txt", "r");
+        if (!f) {
+            ss << "Not found. Creating";
+            //f = fopen("/test.txt", "w");
+            //fprintf(f, "Hello, World!");
+            //fclose(f);
+        } else {
+            char buf[100];
+            fgets(buf, 100, f);
+            fclose(f);
+            ss << "Found: " << buf;
+        }
+        hagl_put_text(display2, ss.str().c_str(), 10, 5, colors[3], font6x9);
+    }
+
+    //hagl_clear(&displays[2]);
 
     while (1) {
-        squares(&displays[0]);
-        circles(&displays[1]);
-        dots(&displays[2]);
+        squares(display);
+        circles(display1);
+        texts(display3);
+        dots(display2);
         if (iteration % 100 == 0) {
-            hagl_clear(&displays[2]);
+            hagl_clear(display2);
         }
         sleep_ms(10);
-        std::wstringstream ss;
+        std::stringstream ss;
         ss << "Iteration: " << iteration;
         //hagl_put_text(&display, ss.str().c_str(), 10, display.height / 5, colors[3], font6x9);
         //hagl_put_text(&display1, ss.str().c_str(), 20, display.height / 2, colors[3], font6x9);
         //hagl_put_text(&display3, ss.str().c_str(), 20, display.height / 1.5, colors[3], font6x9);
 
         ++iteration;
+        //std::cout << ss.str() << "\n";
     };
 }

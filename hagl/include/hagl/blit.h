@@ -41,43 +41,41 @@ SPDX-License-Identifier: MIT
 
 #include "hagl/bitmap.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+
 
 /**
- * Blit a bitmap to a surface
+ * Blit a bitmap to a display
  *
  * Output will be clipped to the current clip window.
  *
- * @param surface
+ * @param display
  * @param x0
  * @param y0
  * @param source pointer to a bitmap
  */
-void hagl_blit_xy(hagl_backend_t *surface, int16_t x0, int16_t y0, hagl_bitmap_t* source);
+void hagl_blit_xy(Display& display, int16_t x0, int16_t y0, hagl_bitmap_t* source);
 
 /**
- * Blit a bitmap to a surface
+ * Blit a bitmap to a display
  *
  * Output will be clipped to the current clip window.
  *
- * @param surface
+ * @param display
  * @param x0
  * @param y0
  * @param source pointer to a bitmap
  */
-static inline void hagl_blit(hagl_backend_t *surface, int16_t x0, int16_t y0, hagl_bitmap_t* source)
+static inline void hagl_blit(Display& display, int16_t x0, int16_t y0, hagl_bitmap_t* source)
 {
-    hagl_blit_xy(surface, x0, y0, source);
+    hagl_blit_xy(display, x0, y0, source);
 }
 
 /**
- * Blit and scale a bitmap to a surface
+ * Blit and scale a bitmap to a display
  *
  * Output will be clipped to the current clip window.
  *
- * @param surface
+ * @param display
  * @param x0
  * @param y0
  * @param w target width
@@ -85,14 +83,14 @@ static inline void hagl_blit(hagl_backend_t *surface, int16_t x0, int16_t y0, ha
  * @param source pointer to a bitmap
  */
 void hagl_blit_xywh(
-    hagl_backend_t *surface, uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, hagl_bitmap_t* source);
+    Display& display, uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, hagl_bitmap_t* source);
 
 /**
- * Blit and scale a bitmap to a surface
+ * Blit and scale a bitmap to a display
  *
  * Output will be clipped to the current clip window.
  *
- * @param surface
+ * @param display
  * @param x0
  * @param y0
  * @param x1
@@ -100,13 +98,10 @@ void hagl_blit_xywh(
  * @param source pointer to a bitmap
  */
 static inline void hagl_blit_xyxy(
-    hagl_backend_t *surface, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, hagl_bitmap_t* source)
+    Display& display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, hagl_bitmap_t* source)
 {
-    hagl_blit_xywh(surface, x0, y0, abs(x1 - x0) + 1, abs(y1 - y0) + 1, source);
+    hagl_blit_xywh(display, x0, y0, abs(x1 - x0) + 1, abs(y1 - y0) + 1, source);
 }
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
 
 #endif /* _HAGL_BLIT_H */

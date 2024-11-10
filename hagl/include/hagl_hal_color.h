@@ -1,3 +1,5 @@
+/*
+
 MIT License
 
 Copyright (c) 2019-2023 Mika Tuupola
@@ -19,3 +21,21 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+-cut-
+
+This file is part of the Raspberry Pi Pico MIPI DCS backend for the HAGL
+graphics library: https://github.com/tuupola/hagl_pico_mipi
+
+SPDX-License-Identifier: MIT
+
+*/
+
+#ifndef _HAGL_PICO_HAL_COLOR_H
+#define _HAGL_PICO_HAL_COLOR_H
+
+#include <stdint.h>
+
+typedef uint16_t hagl_color_t;
+
+#endif /* _HAGL_PICO_HAL_COLOR_H */

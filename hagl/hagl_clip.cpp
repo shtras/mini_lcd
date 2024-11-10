@@ -39,6 +39,7 @@ https://en.wikipedia.org/wiki/Cohen%E2%80%93Sutherland_algorithm
 
 #include "hagl/backend.h"
 #include "hagl/window.h"
+#include "Display.h"
 
 static const uint8_t INSIDE = 0b0000;
 static const uint8_t LEFT = 0b0001;
@@ -64,7 +65,6 @@ static uint8_t code(int16_t x0, int16_t y0, hagl_window_t window)
     return code;
 }
 
-extern "C" {
 
 bool hagl_clip_line(int16_t* x0, int16_t* y0, int16_t* x1, int16_t* y1, hagl_window_t window)
 {
@@ -122,11 +122,11 @@ bool hagl_clip_line(int16_t* x0, int16_t* y0, int16_t* x1, int16_t* y1, hagl_win
     return accept;
 }
 
-void hagl_set_clip(hagl_backend_t* surface, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
+void hagl_set_clip(Display& display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
 {
-    surface->clip.x0 = x0;
-    surface->clip.y0 = y0;
-    surface->clip.x1 = x1;
-    surface->clip.y1 = y1;
+    display.clip.x0 = x0;
+    display.clip.y0 = y0;
+    display.clip.x1 = x1;
+    display.clip.y1 = y1;
 }
-}
+

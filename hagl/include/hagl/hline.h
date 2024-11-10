@@ -41,16 +41,14 @@ SPDX-License-Identifier: MIT
 
 #include "hagl/color.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+
 
 /**
  * Draw a horizontal line
  *
  * Output will be clipped to the current clip window.
  *
- * @param surface
+ * @param display
  * @param x0
  * @param y0
  * @param width
@@ -58,14 +56,14 @@ extern "C" {
  */
 
 void
-hagl_draw_hline_xyw(hagl_backend_t *surface, int16_t x0, int16_t y0, uint16_t width, hagl_color_t color);
+hagl_draw_hline_xyw(Display& display, int16_t x0, int16_t y0, uint16_t width, hagl_color_t color);
 
 /**
  * Draw a horizontal line
  *
  * Output will be clipped to the current clip window.
  *
- * @param surface
+ * @param display
  * @param x0
  * @param y0
  * @param x1
@@ -73,9 +71,9 @@ hagl_draw_hline_xyw(hagl_backend_t *surface, int16_t x0, int16_t y0, uint16_t wi
  */
 
 static inline void
-hagl_draw_hline_xyx(hagl_backend_t *surface, int16_t x0, int16_t y0, int16_t x1, hagl_color_t color)
+hagl_draw_hline_xyx(Display& display, int16_t x0, int16_t y0, int16_t x1, hagl_color_t color)
 {
-    hagl_draw_hline_xyw(surface, x0, y0, abs(x1 - x0) + 1, color);
+    hagl_draw_hline_xyw(display, x0, y0, abs(x1 - x0) + 1, color);
 }
 
 /**
@@ -83,7 +81,7 @@ hagl_draw_hline_xyx(hagl_backend_t *surface, int16_t x0, int16_t y0, int16_t x1,
  *
  * Output will be clipped to the current clip window.
  *
- * @param surface
+ * @param display
  * @param x0
  * @param y0
  * @param width
@@ -91,13 +89,10 @@ hagl_draw_hline_xyx(hagl_backend_t *surface, int16_t x0, int16_t y0, int16_t x1,
  */
 
 static inline void
-hagl_draw_hline(hagl_backend_t *surface, int16_t x0, int16_t y0, uint16_t width, hagl_color_t color)
+hagl_draw_hline(Display& display, int16_t x0, int16_t y0, uint16_t width, hagl_color_t color)
 {
-    hagl_draw_hline_xyw(surface, x0, y0, width, color);
+    hagl_draw_hline_xyw(display, x0, y0, width, color);
 }
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
 
 #endif /* _HAGL_HLINE_H */

@@ -29,19 +29,38 @@ https://github.com/tuupola/hagl
 
 
 SPDX-License-Identifier: MIT
+
 */
 
-#include <stdint.h>
-
+#include "hagl/color.h"
+#include "hagl/line.h"
 #include "hagl/backend.h"
-#include "rgb565.h"
+#include "Display.h"
 
-extern "C" {
-hagl_color_t hagl_color(hagl_backend_t* surface, uint8_t r, uint8_t g, uint8_t b)
+void hagl_draw_hline_xyw(Display& display, int16_t x0, int16_t y0, uint16_t w, hagl_color_t color)
 {
-    if (surface->color) {
-        return surface->color(surface, r, g, b);
+    int16_t width = w;
+
+    /* x0 or y0 is over the edge, nothing to do. */
+    if ((x0 > display.clip.x1) || (y0 > display.clip.y1) || (y0 < display.clip.y0)) {
+        return;
     }
-    return rgb565(r, g, b);
-}
+
+    /* x0 is left of clip window, ignore start part. */
+    if (x0 < display.clip.x0) {
+        width = width + x0;
+        x0 = display.clip.x0;
+    }
+
+    /* Everything outside clip window, nothing to do. */
+    if (width <= 0) {
+        return;
+    }
+
+    /* Cut anything going over right edge of clip window. */
+    if (((x0 + width) > display.clip.x1)) {
+        width = width - (x0 + width - 1 - display.clip.x1);
+    }
+
+    display.hline(x0, y0, width, color);
 }

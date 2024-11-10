@@ -38,9 +38,7 @@ SPDX-License-Identifier: MIT
 #include <time.h>
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+
 
 typedef struct {
     clock_t start;
@@ -98,8 +96,5 @@ fps_reset(fps_instance_t *fps)
     fps->current = 0;
 }
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
 
 #endif /* HAGL_FPS_H */

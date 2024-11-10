@@ -37,9 +37,10 @@ SPDX-License-Identifier: MIT
 #include "hagl/blit.h"
 #include "hagl.h"
 #include "fontx.h"
+#include "Display.h"
 
-uint8_t hagl_get_glyph(hagl_backend_t* surface, wchar_t code, hagl_color_t color,
-    hagl_bitmap_t* bitmap, const uint8_t* font)
+uint8_t hagl_get_glyph(
+    Display& display, wchar_t code, hagl_color_t color, hagl_bitmap_t* bitmap, const uint8_t* font)
 {
     uint8_t status, set;
     fontx_glyph_t glyph;
@@ -51,7 +52,7 @@ uint8_t hagl_get_glyph(hagl_backend_t* surface, wchar_t code, hagl_color_t color
     }
 
     /* Initialise bitmap dimensions. */
-    bitmap->depth = surface->depth;
+    bitmap->depth = display.depth;
     bitmap->width = glyph.width;
     bitmap->height = glyph.height;
     bitmap->pitch = bitmap->width * (bitmap->depth / 8);
@@ -74,8 +75,8 @@ uint8_t hagl_get_glyph(hagl_backend_t* surface, wchar_t code, hagl_color_t color
     return 0;
 }
 
-uint8_t hagl_put_char(hagl_backend_t* surface, wchar_t code, int16_t x0, int16_t y0,
-    hagl_color_t color, const uint8_t* font)
+uint8_t hagl_put_char(
+    Display& display, wchar_t code, int16_t x0, int16_t y0, hagl_color_t color, const uint8_t* font)
 {
     static uint8_t* buffer = NULL;
 
@@ -94,7 +95,7 @@ uint8_t hagl_put_char(hagl_backend_t* surface, wchar_t code, int16_t x0, int16_t
         buffer = (uint8_t*)calloc(HAGL_CHAR_BUFFER_SIZE, sizeof(uint8_t));
     }
 
-    hagl_bitmap_init(&bitmap, glyph.width, glyph.height, surface->depth, (uint8_t*)buffer);
+    hagl_bitmap_init(&bitmap, glyph.width, glyph.height, display.depth, (uint8_t*)buffer);
 
     hagl_color_t* ptr = (hagl_color_t*)bitmap.buffer;
 
@@ -110,7 +111,7 @@ uint8_t hagl_put_char(hagl_backend_t* surface, wchar_t code, int16_t x0, int16_t
         glyph.buffer += glyph.pitch;
     }
 
-    hagl_blit(surface, x0, y0, &bitmap);
+    hagl_blit(display, x0, y0, &bitmap);
 
     return bitmap.width;
 }
@@ -120,7 +121,7 @@ uint8_t hagl_put_char(hagl_backend_t* surface, wchar_t code, int16_t x0, int16_t
  * continue from the next line.
  */
 
-uint16_t hagl_put_text(hagl_backend_t *surface, const wchar_t* str, int16_t x0, int16_t y0,
+uint16_t hagl_put_text(Display& display, const wchar_t* str, int16_t x0, int16_t y0,
     hagl_color_t color, const unsigned char* font)
 {
     wchar_t temp;
@@ -139,7 +140,7 @@ uint16_t hagl_put_text(hagl_backend_t *surface, const wchar_t* str, int16_t x0, 
             x0 = 0;
             y0 += meta.height;
         } else {
-            x0 += hagl_put_char(surface, temp, x0, y0, color, font);
+            x0 += hagl_put_char(display, temp, x0, y0, color, font);
         }
     } while (*str != 0);
 

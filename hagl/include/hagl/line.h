@@ -40,16 +40,14 @@ SPDX-License-Identifier: MIT
 
 #include "hagl/color.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+class Display;
 
 /**
  * Draw a line
  *
  * Output will be clipped to the current clip window.
  *
- * @param surface
+ * @param display
  * @param x0
  * @param y0
  * @param x1
@@ -57,10 +55,7 @@ extern "C" {
  * @param color
  */
 void
-hagl_draw_line(hagl_backend_t *surface, int16_t x0, int16_t y0, int16_t x1, int16_t y1, hagl_color_t color);
+hagl_draw_line(Display& display, int16_t x0, int16_t y0, int16_t x1, int16_t y1, hagl_color_t color);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
 
 #endif /* _HAGL_LINE_H */

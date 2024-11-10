@@ -446,3 +446,5 @@ mipi_display_close(hagl_backend_t *backend)
 {
     spi_deinit(backend->spi);
 }
+
+

@@ -39,45 +39,30 @@ SPDX-License-Identifier: MIT
 #include "hagl/bitmap.h"
 #include "hagl/backend.h"
 
-void hagl_blit_xy(hagl_backend_t* surface, int16_t x0, int16_t y0, hagl_bitmap_t* source)
+void hagl_blit_xy(Display& display, int16_t x0, int16_t y0, hagl_bitmap_t* source)
 {
-    if (surface->blit) {
-        /* Check if bitmap is inside clip windows bounds */
-        if ((x0 < surface->clip.x0) || (y0 < surface->clip.y0) ||
-            (x0 + source->width > surface->clip.x1) || (y0 + source->height > surface->clip.y1)) {
-            /* Out of bounds, use local putpixel fallback. */
-            hagl_color_t color;
-            hagl_color_t* ptr = (hagl_color_t*)source->buffer;
-
-            for (uint16_t y = 0; y < source->height; y++) {
-                for (uint16_t x = 0; x < source->width; x++) {
-                    color = *(ptr++);
-                    hagl_put_pixel(surface, x0 + x, y0 + y, color);
-                }
-            }
-        } else {
-            /* Inside of bounds, can use HAL provided blit. */
-            surface->blit(surface, x0, y0, source);
-        }
-    } else {
+    /* Check if bitmap is inside clip windows bounds */
+    if ((x0 < display.clip.x0) || (y0 < display.clip.y0) ||
+        (x0 + source->width > display.clip.x1) || (y0 + source->height > display.clip.y1)) {
+        /* Out of bounds, use local putpixel fallback. */
         hagl_color_t color;
         hagl_color_t* ptr = (hagl_color_t*)source->buffer;
 
         for (uint16_t y = 0; y < source->height; y++) {
             for (uint16_t x = 0; x < source->width; x++) {
                 color = *(ptr++);
-                hagl_put_pixel(surface, x0 + x, y0 + y, color);
+                hagl_put_pixel(display, x0 + x, y0 + y, color);
             }
         }
+    } else {
+        /* Inside of bounds, can use HAL provided blit. */
+        display.blit(x0, y0, source);
     }
 };
 
-void hagl_blit_xywh(hagl_backend_t* surface, uint16_t x0, uint16_t y0, uint16_t w, uint16_t h,
-    hagl_bitmap_t* source)
+void hagl_blit_xywh(
+    Display& display, uint16_t x0, uint16_t y0, uint16_t w, uint16_t h, hagl_bitmap_t* source)
 {
-    if (surface->scale_blit) {
-        surface->scale_blit(surface, x0, y0, w, h, source);
-    } else {
         hagl_color_t color;
         hagl_color_t* ptr = (hagl_color_t*)source->buffer;
         uint32_t x_ratio = (uint32_t)((source->width << 16) / w);
@@ -88,8 +73,7 @@ void hagl_blit_xywh(hagl_backend_t* surface, uint16_t x0, uint16_t y0, uint16_t 
                 uint16_t px = ((x * x_ratio) >> 16);
                 uint16_t py = ((y * y_ratio) >> 16);
                 color = *(ptr + (py * source->width) + px);
-                hagl_put_pixel(surface, x0 + x, y0 + y, color);
+                hagl_put_pixel(display, x0 + x, y0 + y, color);
             }
         }
-    }
 };

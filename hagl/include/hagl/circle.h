@@ -40,9 +40,8 @@ SPDX-License-Identifier: MIT
 
 #include "hagl/color.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+
+class Display;
 
 /**
  * Draw a circle
@@ -54,8 +53,8 @@ extern "C" {
  * @param r radius
  * @param color
  */
-void
-hagl_draw_circle(hagl_backend_t *surface, int16_t x0, int16_t y0, int16_t r, hagl_color_t color);
+void hagl_draw_circle(Display& display, int16_t x0, int16_t y0, int16_t r, hagl_color_t color);
+
 
 /**
  * Draw a filled circle
@@ -67,11 +66,8 @@ hagl_draw_circle(hagl_backend_t *surface, int16_t x0, int16_t y0, int16_t r, hag
  * @param r radius
  * @param color
  */
-void
-hagl_fill_circle(hagl_backend_t *surface, int16_t x0, int16_t y0, int16_t r, hagl_color_t color);
+void hagl_fill_circle(
+    Display& display, int16_t x0, int16_t y0, int16_t r, hagl_color_t color);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
 
 #endif /* _HAGL_CIRCLE_H */

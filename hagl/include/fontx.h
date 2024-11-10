@@ -41,9 +41,7 @@ SPDX-License-Identifier: MIT
 #include <stdint.h>
 #include <stddef.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif /* __cplusplus */
+
 
 #define FONTX_OK                   (0)
 #define FONTX_ERR_GLYPH_NOT_FOUND  (1)
@@ -76,8 +74,5 @@ typedef struct {
 uint8_t fontx_meta(fontx_meta_t *meta, const uint8_t *font);
 uint8_t fontx_glyph(fontx_glyph_t *glyph, wchar_t code, const uint8_t *font);
 
-#ifdef __cplusplus
-}
-#endif /* __cplusplus */
 
 #endif /* _HAGL_FONTX_H */

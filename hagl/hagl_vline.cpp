@@ -2,7 +2,7 @@
 
 MIT License
 
-Copyright (c) 2019-2023 Mika Tuupola
+Copyright (c) 2018-2023 Mika Tuupola
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -24,25 +24,43 @@ SOFTWARE.
 
 -cut-
 
-This file is part of the Raspberry Pi Pico MIPI DCS backend for the HAGL
-graphics library: https://github.com/tuupola/hagl_pico_mipi
+This file is part of the HAGL graphics library:
+https://github.com/tuupola/hagl
+
 
 SPDX-License-Identifier: MIT
 
 */
 
-#ifndef _HAGL_PICO_HAL_COLOR_H
-#define _HAGL_PICO_HAL_COLOR_H
+#include "hagl/line.h"
+#include "hagl/backend.h"
+#include "hagl/color.h"
+#include "Display.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+void hagl_draw_vline_xyh(Display& display, int16_t x0, int16_t y0, uint16_t h, hagl_color_t color)
+{
+    int16_t height = h;
 
-#include <stdint.h>
+    /* x0 or y0 is over the edge, nothing to do. */
+    if ((x0 > display.clip.x1) || (x0 < display.clip.x0) || (y0 > display.clip.y1)) {
+        return;
+    }
 
-typedef uint16_t hagl_color_t;
+    /* y0 is top of clip window, ignore start part. */
+    if (y0 < display.clip.y0) {
+        height = height + y0;
+        y0 = display.clip.y0;
+    }
 
-#ifdef __cplusplus
+    /* Everything outside clip window, nothing to do. */
+    if (height <= 0) {
+        return;
+    }
+
+    /* Cut anything going over right edge. */
+    if (((y0 + height) > display.clip.y1)) {
+        height = height - (y0 + height - 1 - display.clip.y1);
+    }
+
+    display.vline(x0, y0, height, color);
 }
-#endif
-#endif /* _HAGL_PICO_HAL_COLOR_H */

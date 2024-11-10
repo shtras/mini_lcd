@@ -25,7 +25,7 @@ All notable changes to this project will be documented in this file, in reverse 
 ## [0.6.0](https://github.com/tuupola/hagl/compare/0.5.0...0.6.0) - 2023-03-04
 
 ### Changed
-- You must now pass drawing surface to all drawing functions ([#65](https://github.com/tuupola/hagl/pull/65)).
+- You must now pass drawing display to all drawing functions ([#65](https://github.com/tuupola/hagl/pull/65)).
     ```c
     hagl_backend_t *display = hagl_init();
     hagl_put_pixel(display, x, y, color);
