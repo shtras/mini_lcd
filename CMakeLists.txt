@@ -16,6 +16,9 @@ target_compile_options(mini_lcd_compiler_flags INTERFACE "$<$<CONFIG:Debug>:-Wno
 target_compile_options(mini_lcd_compiler_flags INTERFACE "$<$<NOT:$<CONFIG:Debug>>:-Werror>")
 
 add_executable(mini_lcd
+        Encoder.cpp
+        Snake.cpp
+        Utils.cpp
         main.cpp
 )
 

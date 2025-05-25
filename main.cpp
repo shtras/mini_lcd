@@ -1,4 +1,6 @@
 #include "Display.h"
+#include "Encoder.h"
+#include "Snake.h"
 
 #include <hagl_hal.h>
 #include <hagl.h>
@@ -170,19 +172,18 @@ void irq_callback(uint gpio, uint32_t event) {
 int main()
 {
     stdio_init_all();
-    gpio_set_dir(15, GPIO_IN);
-    gpio_set_dir(14, GPIO_IN);
-    gpio_pull_up(14);
-    gpio_pull_up(15);
 
-    gpio_set_irq_enabled_with_callback(15, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true, &irq_callback);
-    gpio_set_irq_enabled_with_callback(14, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true, &irq_callback);
+    mini_lcd::Encoder encoder(14, 15, 18);
+    mini_lcd::Encoder encoder1(12, 13, 18);
+    encoder.setOnLeft([]() { std::cout << "Encoder: Left\n"; });
+    encoder.setOnRight([]() { std::cout << "Encoder: Right\n"; });
+    encoder1.setOnLeft([]() { std::cout << "Encoder1: Left\n"; });
+    encoder1.setOnRight([]() { std::cout << "Encoder1: Right\n"; });
 
     std::array<hagl_backend_t, 2> displays;
 
     Display display(10, 11, 3, 2, spi1);
     Display display1(10, 11, 6, 7, spi1);
-    //hagl_init(&displays[2], 10, 11, 0, 1, spi1);
     Display display2(10, 11, 0, 1, spi1);
     Display display3(10, 11, 17, 16, spi1);
 
@@ -223,9 +224,12 @@ int main()
     }
 
     //hagl_clear(&displays[2]);
+    mini_lcd::Snake snake(display);
+    encoder.setOnLeft([&snake]() { snake.left(); });
+    encoder.setOnRight([&snake]() { snake.right(); });
 
     while (1) {
-        squares(display);
+        //squares(display);
         circles(display1);
         texts(display3);
         dots(display2);
@@ -233,13 +237,15 @@ int main()
             hagl_clear(display2);
         }
         sleep_ms(10);
-        std::stringstream ss;
+        std::wstringstream ss;
         ss << "Iteration: " << iteration;
-        //hagl_put_text(&display, ss.str().c_str(), 10, display.height / 5, colors[3], font6x9);
-        //hagl_put_text(&display1, ss.str().c_str(), 20, display.height / 2, colors[3], font6x9);
-        //hagl_put_text(&display3, ss.str().c_str(), 20, display.height / 1.5, colors[3], font6x9);
+        //hagl_put_text(display, ss.str().c_str(), 10, display.height / 5, colors[3], font6x9);
+        hagl_put_text(display1, ss.str().c_str(), 20, display.height / 2, colors[3], font6x9);
+        hagl_put_text(display3, ss.str().c_str(), 20, display.height / 1.5, colors[3], font6x9);
+        snake.process();
 
         ++iteration;
-        //std::cout << ss.str() << "\n";
+        encoder.process();
+        encoder1.process();
     };
 }
