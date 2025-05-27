@@ -22,6 +22,7 @@ add_executable(mini_lcd
         Snake.cpp
         Utils.cpp
         TCP.cpp
+        Comm.cpp
         tiny-json.c
         main.cpp
 )
@@ -55,6 +56,7 @@ target_compile_definitions(mini_lcd PRIVATE
 
         WIFI_SSID="${WIFI_SSID}"
         WIFI_PASSWORD="${WIFI_PASSWORD}"
+        SERVER_ADDR="${SERVER_ADDR}"
 )
 
 target_link_libraries(mini_lcd mini_lcd_compiler_flags pico_stdlib hagl pico_multicore pico_cyw43_arch_lwip_threadsafe_background)

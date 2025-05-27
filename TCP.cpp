@@ -1,9 +1,11 @@
 #include "TCP.h"
+#include "Comm.h"
 
 #include "tiny-json.h"
 
 #include "pico/stdlib.h"
 #include "pico/cyw43_arch.h"
+#include <pico/multicore.h>
 
 #include <iostream>
 #include <sstream>
@@ -43,7 +45,7 @@ void TCPTest::getMeasurements()
         return;
     }
     reporting_ = true;
-    ip4addr_aton("192.168.1.198", &remote_addr);
+    ip4addr_aton(SERVER_ADDR, &remote_addr);
     pcb = tcp_new_ip_type(IP_GET_TYPE(&remote_addr));
     if (!pcb) {
         std::cout << "Failed to create pcb\n";
@@ -82,24 +84,50 @@ err_t TCPTest::recv(tcp_pcb* arg, pbuf* buf, err_t err)
     std::cout << "TCP received " << (int)buf->len << " " << (int)buf->tot_len << "\n";
     //std::cout << std::string_view{(char*)buf->payload, buf->len} << "\n";
     auto jsonStr = std::string((char*)buf->payload, buf->len);
+    auto jsonStartPos = jsonStr.find('{');
+    if (jsonStartPos == std::string::npos) {
+        std::cout << "No JSON object found in response\n";
+        tcp_recved(pcb, buf->tot_len);
+        pbuf_free(buf);
+        return close(0);
+    }
+    jsonStr = jsonStr.substr(jsonStartPos);
     std::cout << "JSON: " << jsonStr << "\n";
-    json_t pool[ 64 ];
+    json_t pool[128];
     auto parent = json_create((char*)jsonStr.c_str(), pool, sizeof pool / sizeof *pool);
     if (parent == nullptr) {
         std::cout << "Failed to parse JSON\n";
-    } else {
-        auto measurements = json_getProperty(parent, "measurements");
-        if (!measurements || json_getType(measurements) != JSON_ARRAY) {
-            std::cout << "No measurements found in JSON\n";
-        } else {
-            for (auto measurement = json_getChild(measurements); measurement;
-                 measurement = json_getSibling(measurement)) {
-                if (json_getType(measurement) == JSON_OBJ) {
-                    auto time = json_getPropertyValue(measurement, "time");
-                    auto cpu0 = json_getPropertyValue(measurement, "CPU0");
-                    std::cout << time << ": CPU0: " << cpu0 << "\n";
+        tcp_recved(pcb, buf->tot_len);
+        pbuf_free(buf);
+        return close(0);
+    }
+    auto measurements = json_getProperty(parent, "measurements");
+    if (!measurements || json_getType(measurements) != JSON_ARRAY) {
+        std::cout << "No measurements found in JSON\n";
+        tcp_recved(pcb, buf->tot_len);
+        pbuf_free(buf);
+        return close(0);
+    }
+    for (auto measurement = json_getChild(measurements); measurement;
+        measurement = json_getSibling(measurement)) {
+        multicore_fifo_push_blocking(static_cast<uint32_t>(mini_lcd::Message::Type::Measurements));
+        if (json_getType(measurement) == JSON_OBJ) {
+            auto time = json_getPropertyValue(measurement, "time");
+            for (int i=0; i<16; ++i) {
+                std::string cpuName = "CPU" + std::to_string(i);
+                auto cpuVal = json_getPropertyValue(measurement, cpuName.c_str());
+                uint32_t cpuValInt = 0;
+                if (cpuVal) {
+                    cpuValInt = std::stoi(cpuVal);
                 }
+                multicore_fifo_push_blocking(cpuValInt);
             }
+            auto gpu = json_getPropertyValue(measurement, "GPU");
+            uint32_t gpuVal = 0;
+            if (gpu) {
+                gpuVal = std::stoi(gpu);
+            }
+            multicore_fifo_push_blocking(gpuVal);
         }
     }
 
@@ -121,7 +149,7 @@ err_t TCPTest::conn(tcp_pcb* arg, err_t err)
     std::cout << "TCP Connected\n";
 
     std::stringstream ss;
-    ss << "GET /test HTTP/1.1\r\n"
+    ss << "GET /measurements HTTP/1.1\r\n"
           "\r\n\r\n";
     //ss << std::setw(4) << co2_ << std::setprecision(4) << std::setw(5) << hum_ << std::setprecision(4) << std::setw(5)
     //   << temp_;

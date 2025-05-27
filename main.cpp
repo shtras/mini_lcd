@@ -2,11 +2,13 @@
 #include "Encoder.h"
 #include "Snake.h"
 #include "TCP.h"
+#include "Comm.h"
 #include "ino_compat.h"
 
 #include <hagl_hal.h>
 #include <hagl.h>
 #include <font6x9.h>
+#include <font5x8.h>
 
 #include <pico/stdlib.h>
 #include <pico/binary_info.h>
@@ -165,8 +167,24 @@ void irq_callback(uint gpio, uint32_t event)
     }
 }
 
+void plotMeasurements(Display& display, mini_lcd::Message* msg)
+{
+    hagl_clear(display);
+    for (int i = 0; i < 16; ++i) {
+        std::wstringstream ss;
+        ss << "CPU" << i << ": " << msg->data[i] << " %";
+        hagl_put_text(
+            display, ss.str().c_str(), 20, i * 9, hagl_color(display, 255, 255, 255), font5x8);
+    }
+    std::wstringstream ss;
+    ss << "GPU: " << msg->data[16] << " %";
+    hagl_put_text(
+        display, ss.str().c_str(), 20, 16 * 9, hagl_color(display, 255, 255, 255), font5x8);
+}
+
 void displayThread()
 {
+    mini_lcd::Receiver receiver;
     gpio_pull_up(15); // SPI on pin 15
 
     Display display(10, 11, 3, 2, spi1);
@@ -194,10 +212,14 @@ void displayThread()
     //auto res = hagl_load_image(display, 0, 0, "/sd/test.jpg");
 
     //hagl_clear(&displays[2]);
-    mini_lcd::Snake snake(display);
+    //mini_lcd::Snake snake(display);
 
     while (1) {
         //squares(display);
+        auto msg = receiver.process();
+        if (msg && msg->type == mini_lcd::Message::Type::Measurements) {
+            plotMeasurements(display, msg);
+        }
         circles(display1);
         texts(display3);
         dots(display2);
@@ -210,7 +232,7 @@ void displayThread()
         //hagl_put_text(display, ss.str().c_str(), 10, display.height / 5, colors[3], font6x9);
         hagl_put_text(display1, ss.str().c_str(), 20, display.height / 2, colors[3], font6x9);
         hagl_put_text(display3, ss.str().c_str(), 20, display.height / 1.5, colors[3], font6x9);
-        snake.process();
+        //snake.process();
 
         ++iteration;
     };
