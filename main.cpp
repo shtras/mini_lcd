@@ -1,18 +1,23 @@
 #include "Display.h"
 #include "Encoder.h"
 #include "Snake.h"
+#include "TCP.h"
+#include "ino_compat.h"
 
 #include <hagl_hal.h>
 #include <hagl.h>
 #include <font6x9.h>
 
-#include "pico/stdlib.h"
-#include "pico/binary_info.h"
+#include <pico/stdlib.h>
+#include <pico/binary_info.h>
+#include <pico/multicore.h>
 #include <hardware/spi.h>
 
 #include <iostream>
 #include <array>
 #include <sstream>
+
+using Timestamp = decltype(millis());
 
 void foo1(Display& display)
 {
@@ -92,16 +97,6 @@ void circles(Display& display)
         display, display.width / 2, display.height / 2, r, hagl_color(display, 255, 255, 0));
 }
 
-inline uint64_t micros()
-{
-    return time_us_64();
-}
-
-inline uint64_t millis()
-{
-    return micros() / 1000ULL;
-}
-
 void texts(Display& display)
 {
     std::array<std::wstring, 15> strs = {
@@ -123,7 +118,7 @@ void texts(Display& display)
     };
 
     static int start_idx = 0;
-    static uint64_t last_time = millis();
+    static Timestamp last_time = millis();
     if (millis() - last_time > 300) {
         last_time = millis();
         start_idx = (start_idx + 1) % strs.size();
@@ -169,19 +164,8 @@ void irq_callback(uint gpio, uint32_t event) {
     }
 }
 
-int main()
+void displayThread()
 {
-    stdio_init_all();
-
-    mini_lcd::Encoder encoder(14, 15, 18);
-    mini_lcd::Encoder encoder1(12, 13, 18);
-    encoder.setOnLeft([]() { std::cout << "Encoder: Left\n"; });
-    encoder.setOnRight([]() { std::cout << "Encoder: Right\n"; });
-    encoder1.setOnLeft([]() { std::cout << "Encoder1: Left\n"; });
-    encoder1.setOnRight([]() { std::cout << "Encoder1: Right\n"; });
-
-    std::array<hagl_backend_t, 2> displays;
-
     Display display(10, 11, 3, 2, spi1);
     Display display1(10, 11, 6, 7, spi1);
     Display display2(10, 11, 0, 1, spi1);
@@ -193,6 +177,7 @@ int main()
     display1.init();
     display2.init();
     display3.init();
+
 
     std::array<uint16_t, 4> colors = {hagl_color(display, 255, 0, 0),
         hagl_color(display, 0, 255, 0), hagl_color(display, 0, 0, 255),
@@ -206,27 +191,9 @@ int main()
     hagl_clear(display3);
     //auto res = hagl_load_image(display, 0, 0, "/sd/test.jpg");
 
-    if (0) {
-        std::wstringstream ss;
-        auto f = fopen("/test.txt", "r");
-        if (!f) {
-            ss << "Not found. Creating";
-            //f = fopen("/test.txt", "w");
-            //fprintf(f, "Hello, World!");
-            //fclose(f);
-        } else {
-            char buf[100];
-            fgets(buf, 100, f);
-            fclose(f);
-            ss << "Found: " << buf;
-        }
-        hagl_put_text(display2, ss.str().c_str(), 10, 5, colors[3], font6x9);
-    }
-
     //hagl_clear(&displays[2]);
     mini_lcd::Snake snake(display);
-    encoder.setOnLeft([&snake]() { snake.left(); });
-    encoder.setOnRight([&snake]() { snake.right(); });
+
 
     while (1) {
         //squares(display);
@@ -245,7 +212,43 @@ int main()
         snake.process();
 
         ++iteration;
-        encoder.process();
-        encoder1.process();
+
     };
+}
+
+void mainThread()
+{
+    // mini_lcd::Encoder encoder(14, 15, 18);
+    // mini_lcd::Encoder encoder1(12, 13, 18);
+    // encoder.setOnLeft([]() { std::cout << "Encoder: Left\n"; });
+    // encoder.setOnRight([]() { std::cout << "Encoder: Right\n"; });
+    // encoder1.setOnLeft([]() { std::cout << "Encoder1: Left\n"; });
+    // encoder1.setOnRight([]() { std::cout << "Encoder1: Right\n"; });
+
+    // encoder.setOnLeft([&snake]() { snake.left(); });
+    // encoder.setOnRight([&snake]() { snake.right(); });
+    
+    Timestamp lastTime = millis();
+    mini_lcd::TCPTest tcp;
+    while (!tcp.connect());
+
+    while(1) {
+        Timestamp currentTime = millis();
+        if (currentTime - lastTime > 5000) {
+            lastTime = currentTime;
+            std::cout << "Main thread running...\n";
+            tcp.getMeasurements();
+        }
+        // encoder.process();
+        // encoder1.process();
+    }
+}
+
+int main()
+{
+    stdio_init_all();
+    sleep_ms(2000);
+    std::cout << "Start!\n";
+    multicore_launch_core1(displayThread);
+    mainThread();
 }
