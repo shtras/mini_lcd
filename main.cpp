@@ -134,14 +134,15 @@ void texts(Display& display)
 
 bool checkingDirection = false;
 
-void irq_callback(uint gpio, uint32_t event) {
+void irq_callback(uint gpio, uint32_t event)
+{
     std::cout << "GPIO " << gpio << " event " << event << " ";
     if (event & GPIO_IRQ_EDGE_RISE) {
         std::cout << "Rise ";
     }
     if (event & GPIO_IRQ_EDGE_FALL) {
         std::cout << "Fall ";
-    } 
+    }
     if (event & GPIO_IRQ_LEVEL_HIGH) {
         std::cout << "High ";
     }
@@ -166,6 +167,8 @@ void irq_callback(uint gpio, uint32_t event) {
 
 void displayThread()
 {
+    gpio_pull_up(15); // SPI on pin 15
+
     Display display(10, 11, 3, 2, spi1);
     Display display1(10, 11, 6, 7, spi1);
     Display display2(10, 11, 0, 1, spi1);
@@ -177,7 +180,6 @@ void displayThread()
     display1.init();
     display2.init();
     display3.init();
-
 
     std::array<uint16_t, 4> colors = {hagl_color(display, 255, 0, 0),
         hagl_color(display, 0, 255, 0), hagl_color(display, 0, 0, 255),
@@ -193,7 +195,6 @@ void displayThread()
 
     //hagl_clear(&displays[2]);
     mini_lcd::Snake snake(display);
-
 
     while (1) {
         //squares(display);
@@ -212,7 +213,6 @@ void displayThread()
         snake.process();
 
         ++iteration;
-
     };
 }
 
@@ -227,12 +227,13 @@ void mainThread()
 
     // encoder.setOnLeft([&snake]() { snake.left(); });
     // encoder.setOnRight([&snake]() { snake.right(); });
-    
+
     Timestamp lastTime = millis();
     mini_lcd::TCPTest tcp;
-    while (!tcp.connect());
+    while (!tcp.connect())
+        ;
 
-    while(1) {
+    while (1) {
         Timestamp currentTime = millis();
         if (currentTime - lastTime > 5000) {
             lastTime = currentTime;
