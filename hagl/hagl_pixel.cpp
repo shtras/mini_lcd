@@ -59,17 +59,17 @@ hagl_color_t hagl_get_pixel(Display& display, int16_t x0, int16_t y0)
 {
     /* x0 or y0 is before the edge, nothing to do. */
     if ((x0 < display.clip.x0) || (y0 < display.clip.y0)) {
-        return hagl_color(display, 0, 0, 0);
+        return hagl_color(0, 0, 0);
     }
 
     /* x0 or y0 is after the edge, nothing to do. */
     if ((x0 > display.clip.x1) || (y0 > display.clip.y1)) {
-        return hagl_color(display, 0, 0, 0);
+        return hagl_color(0, 0, 0);
     }
 
     //if (display.get_pixel) {
     //    return display.get_pixel(display, x0, y0);
     //}
 
-    return hagl_color(display, 0, 0, 0);
+    return hagl_color(0, 0, 0);
 }

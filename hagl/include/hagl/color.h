@@ -49,7 +49,7 @@ class Display;
  * @param display
  * @return color
  */
-hagl_color_t hagl_color(Display& display, uint8_t r, uint8_t g, uint8_t b);
+hagl_color_t hagl_color(uint8_t r, uint8_t g, uint8_t b);
 
 
 #endif /* _HAGL_COLOR_H */

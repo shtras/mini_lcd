@@ -50,7 +50,7 @@ To write portable code which can be run with different pixel formats use the fol
 uint8_t r = rand() % 255;
 uint8_t g = rand() % 255;
 uint8_t b = rand() % 255;
-hagl_color_t color = hagl_color(display, r, g, b);
+hagl_color_t color = hagl_color(r, g, b);
 ```
 
 ### Put a pixel

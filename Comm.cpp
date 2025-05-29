@@ -8,11 +8,7 @@
 
 namespace mini_lcd
 {
-namespace
-{
-const std::map<Message::Type, int> messageSize = {
-    {Message::Type::Measurements, 17}};
-}
+const std::map<Message::Type, int> Message::Size = {{Message::Type::Measurements, 21}};
 
 Message* Receiver::process()
 {
@@ -25,11 +21,11 @@ Message* Receiver::process()
             Message::Type type = static_cast<Message::Type>(val);
             //std::cout << "Now receiving " << val << "\n";
             message_.type = type;
-            if (messageSize.count(type) == 0) {
+            if (Message::Size.count(type) == 0) {
                 std::cout << "Bad message type: " << val << "\n";
                 return nullptr;
             }
-            toReceive_ = messageSize.at(type);
+            toReceive_ = Message::Size.at(type);
             if (toReceive_ == 0) {
                 return &message_;
             }

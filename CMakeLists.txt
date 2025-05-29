@@ -23,6 +23,7 @@ add_executable(mini_lcd
         Utils.cpp
         TCP.cpp
         Comm.cpp
+        PerfGraph.cpp
         tiny-json.c
         main.cpp
 )

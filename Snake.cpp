@@ -121,22 +121,20 @@ void Snake::spawnApple()
         trySpawn();
     }
     hagl_fill_rounded_rectangle(display_, apple_.x * blockWidth_, apple_.y * blockHeight_,
-        (apple_.x + 1) * blockWidth_, (apple_.y + 1) * blockHeight_, 4,
-        hagl_color(display_, 0, 255, 0));
+        (apple_.x + 1) * blockWidth_, (apple_.y + 1) * blockHeight_, 4, hagl_color(0, 255, 0));
 }
 
 void Snake::erase(Segment segment)
 {
     hagl_fill_rectangle(display_, segment.x * blockWidth_, segment.y * blockHeight_,
-        (segment.x + 1) * blockWidth_, (segment.y + 1) * blockHeight_,
-        hagl_color(display_, 0, 0, 0));
+        (segment.x + 1) * blockWidth_, (segment.y + 1) * blockHeight_, hagl_color(0, 0, 0));
 }
 
 void Snake::draw(Segment segment)
 {
     hagl_fill_rounded_rectangle(display_, segment.x * blockWidth_ + 2, segment.y * blockHeight_ + 2,
         (segment.x + 1) * blockWidth_ - 2, (segment.y + 1) * blockHeight_ - 2, 3,
-        hagl_color(display_, 255, 0, 0));
+        hagl_color(255, 0, 0));
 }
 
 void Snake::reset()
@@ -147,15 +145,15 @@ void Snake::reset()
     hagl_clear(display_);
     for (int i = 0; i <= width_; ++i) {
         hagl_fill_rectangle(display_, i * blockWidth_, 0, (i + 1) * blockWidth_, blockHeight_,
-            hagl_color(display_, 10, 50, 255));
+            hagl_color(10, 50, 255));
         hagl_fill_rectangle(display_, i * blockWidth_, (height_ - 1) * blockHeight_,
-            (i + 1) * blockWidth_, height_ * blockHeight_, hagl_color(display_, 10, 50, 255));
+            (i + 1) * blockWidth_, height_ * blockHeight_, hagl_color(10, 50, 255));
     }
     for (int i = 1; i < height_ - 1; ++i) {
         hagl_fill_rectangle(display_, 0, i * blockHeight_, blockWidth_, (i + 1) * blockHeight_,
-            hagl_color(display_, 10, 50, 255));
+            hagl_color(10, 50, 255));
         hagl_fill_rectangle(display_, width_ * blockWidth_, i * blockHeight_,
-            (width_ + 1) * blockWidth_, (i + 1) * blockHeight_, hagl_color(display_, 10, 50, 255));
+            (width_ + 1) * blockWidth_, (i + 1) * blockHeight_, hagl_color(10, 50, 255));
     }
     segments_.push_back({5, 5});
     segments_.push_back({4, 5});

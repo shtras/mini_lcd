@@ -3,12 +3,12 @@
 #include "Snake.h"
 #include "TCP.h"
 #include "Comm.h"
+#include "PerfGraph.h"
 #include "ino_compat.h"
 
 #include <hagl_hal.h>
 #include <hagl.h>
-#include <font6x9.h>
-#include <font5x8.h>
+#include <fonts.h>
 
 #include <pico/stdlib.h>
 #include <pico/binary_info.h>
@@ -16,10 +16,9 @@
 #include <hardware/spi.h>
 
 #include <iostream>
+#include <iomanip>
 #include <array>
 #include <sstream>
-
-using Timestamp = decltype(millis());
 
 void foo1(Display& display)
 {
@@ -27,7 +26,7 @@ void foo1(Display& display)
     int x = 5;
     int y = 5;
     for (;;) {
-        hagl_put_pixel(display, x, y, hagl_color(display, 255, 0, 0));
+        hagl_put_pixel(display, x, y, hagl_color(255, 0, 0));
         sleep_ms(50);
         ++x;
         y += 2;
@@ -53,7 +52,7 @@ static void mipi_display_spi_master_init()
 void dots(Display& display)
 {
     hagl_draw_circle(display, rand() % display.width, rand() % display.height, 2,
-        hagl_color(display, rand() % 255, rand() % 255, rand() % 255));
+        hagl_color(rand() % 255, rand() % 255, rand() % 255));
 }
 
 void squares(Display& display)
@@ -63,7 +62,7 @@ void squares(Display& display)
     static int dx = 5;
     static int dy = 3;
 
-    hagl_fill_rounded_rectangle(display, x, y, x + 10, y + 10, 5, hagl_color(display, 0, 0, 0));
+    hagl_fill_rounded_rectangle(display, x, y, x + 10, y + 10, 5, hagl_color(0, 0, 0));
 
     x += dx;
     y += dy;
@@ -75,15 +74,14 @@ void squares(Display& display)
         dy = -dy;
     }
 
-    hagl_fill_rounded_rectangle(display, x, y, x + 10, y + 10, 5, hagl_color(display, 0, 255, 255));
+    hagl_fill_rounded_rectangle(display, x, y, x + 10, y + 10, 5, hagl_color(0, 255, 255));
 }
 
 void circles(Display& display)
 {
     static int r = 2;
     static bool expanding = true;
-    hagl_draw_circle(
-        display, display.width / 2, display.height / 2, r, hagl_color(display, 0, 0, 0));
+    hagl_draw_circle(display, display.width / 2, display.height / 2, r, hagl_color(0, 0, 0));
     if (expanding) {
         r++;
         if (r > display.width / 2) {
@@ -95,8 +93,7 @@ void circles(Display& display)
             expanding = true;
         }
     }
-    hagl_draw_circle(
-        display, display.width / 2, display.height / 2, r, hagl_color(display, 255, 255, 0));
+    hagl_draw_circle(display, display.width / 2, display.height / 2, r, hagl_color(255, 255, 0));
 }
 
 void texts(Display& display)
@@ -128,8 +125,8 @@ void texts(Display& display)
 
         for (int i = 0; i < static_cast<int>(strs.size()); ++i) {
             int idx = (start_idx + i) % strs.size();
-            hagl_put_text(display, strs[idx].c_str(), 1, 1 + i * 10,
-                hagl_color(display, 255, 100, 0), font6x9);
+            hagl_put_text(
+                display, strs[idx].c_str(), 1, 1 + i * 10, hagl_color(255, 100, 0), Fonts::font6x9);
         }
     }
 }
@@ -167,72 +164,62 @@ void irq_callback(uint gpio, uint32_t event)
     }
 }
 
-void plotMeasurements(Display& display, mini_lcd::Message* msg)
-{
-    hagl_clear(display);
-    for (int i = 0; i < 16; ++i) {
-        std::wstringstream ss;
-        ss << "CPU" << i << ": " << msg->data[i] << " %";
-        hagl_put_text(
-            display, ss.str().c_str(), 20, i * 9, hagl_color(display, 255, 255, 255), font5x8);
-    }
-    std::wstringstream ss;
-    ss << "GPU: " << msg->data[16] << " %";
-    hagl_put_text(
-        display, ss.str().c_str(), 20, 16 * 9, hagl_color(display, 255, 255, 255), font5x8);
-}
-
 void displayThread()
 {
     mini_lcd::Receiver receiver;
     gpio_pull_up(15); // SPI on pin 15
 
-    Display display(10, 11, 3, 2, spi1);
+    Display cpuDisplay(10, 11, 3, 2, spi1);
+    Display miscDisplay(10, 11, 0, 1, spi1);
     Display display1(10, 11, 6, 7, spi1);
-    Display display2(10, 11, 0, 1, spi1);
-    Display display3(10, 11, 17, 16, spi1);
+    Display display2(10, 11, 17, 16, spi1);
+
+    mini_lcd::PerfGraph perfGraph(&cpuDisplay, &miscDisplay);
 
     mipi_display_spi_master_init();
 
-    display.init();
+    cpuDisplay.init();
+    miscDisplay.init();
     display1.init();
     display2.init();
-    display3.init();
 
-    std::array<uint16_t, 4> colors = {hagl_color(display, 255, 0, 0),
-        hagl_color(display, 0, 255, 0), hagl_color(display, 0, 0, 255),
-        hagl_color(display, 255, 255, 255)};
+    std::array<uint16_t, 4> colors = {hagl_color(255, 0, 0), hagl_color(0, 255, 0),
+        hagl_color(0, 0, 255), hagl_color(255, 255, 255)};
 
     int32_t iteration = 0;
 
-    hagl_clear(display);
+    hagl_clear(cpuDisplay);
+    hagl_clear(miscDisplay);
     hagl_clear(display1);
     hagl_clear(display2);
-    hagl_clear(display3);
-    //auto res = hagl_load_image(display, 0, 0, "/sd/test.jpg");
 
-    //hagl_clear(&displays[2]);
-    //mini_lcd::Snake snake(display);
+    std::wstring str1 = L"Something good";
+    std::wstring str2 = L"coming to this";
+    std::wstring str3 = L" display soon";
+
+    auto startTime = millis();
+
+    hagl_put_text(display1, str1.c_str(), 20, 20, hagl_color(255, 100, 0), Fonts::font6x9);
+    hagl_put_text(display1, str2.c_str(), 20, 35, hagl_color(255, 100, 0), Fonts::font6x9);
+    hagl_put_text(display1, str3.c_str(), 20, 50, hagl_color(255, 100, 0), Fonts::font6x9);
+    hagl_put_text(display2, str1.c_str(), 20, 20, hagl_color(255, 100, 0), Fonts::font6x9);
+    hagl_put_text(display2, str2.c_str(), 20, 35, hagl_color(255, 100, 0), Fonts::font6x9);
+    hagl_put_text(display2, str3.c_str(), 20, 50, hagl_color(255, 100, 0), Fonts::font6x9);
 
     while (1) {
-        //squares(display);
         auto msg = receiver.process();
         if (msg && msg->type == mini_lcd::Message::Type::Measurements) {
-            plotMeasurements(display, msg);
+            perfGraph.AddData(*msg);
+            perfGraph.Draw();
         }
-        circles(display1);
-        texts(display3);
-        dots(display2);
-        if (iteration % 100 == 0) {
-            hagl_clear(display2);
-        }
-        sleep_ms(10);
+        sleep_ms(100);
+        auto currTime = millis();
+
         std::wstringstream ss;
-        ss << "Iteration: " << iteration;
-        //hagl_put_text(display, ss.str().c_str(), 10, display.height / 5, colors[3], font6x9);
-        hagl_put_text(display1, ss.str().c_str(), 20, display.height / 2, colors[3], font6x9);
-        hagl_put_text(display3, ss.str().c_str(), 20, display.height / 1.5, colors[3], font6x9);
-        //snake.process();
+        ss << "Running for: " << std::fixed << std::setprecision(2)
+           << (currTime - startTime) / 1000.0f << " s";
+        hagl_put_text(
+            display2, ss.str().c_str(), 10, cpuDisplay.height / 1.5, colors[3], Fonts::font5x7);
 
         ++iteration;
     };

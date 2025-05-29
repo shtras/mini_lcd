@@ -14,6 +14,8 @@ struct Message
     enum class Type : uint32_t { Unknown, Measurements };
     Type type = Type::Unknown;
     std::array<uint32_t, 32> data;
+
+    static const std::map<Message::Type, int> Size;
 };
 
 class Receiver

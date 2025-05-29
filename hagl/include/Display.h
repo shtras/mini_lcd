@@ -12,9 +12,9 @@ class Display
 {
 public:
     hagl_window_t clip{0, 0, MIPI_DISPLAY_WIDTH - 1, MIPI_DISPLAY_HEIGHT - 1};
-    int16_t width = MIPI_DISPLAY_WIDTH;
-    int16_t height = MIPI_DISPLAY_HEIGHT;
-    uint8_t depth = MIPI_DISPLAY_DEPTH;
+    static constexpr int16_t width = MIPI_DISPLAY_WIDTH;
+    static constexpr int16_t height = MIPI_DISPLAY_HEIGHT;
+    static constexpr uint8_t depth = MIPI_DISPLAY_DEPTH;
 
     Display(Pin scl, Pin sda, Pin dc, Pin cs, spi_inst_t* spi);
 

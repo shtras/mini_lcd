@@ -108,26 +108,30 @@ err_t TCPTest::recv(tcp_pcb* arg, pbuf* buf, err_t err)
         pbuf_free(buf);
         return close(0);
     }
+
+    auto parseAndSend = [](const json_t* measurement, const char* value) {
+        uint32_t val = 0;
+        auto valStr = json_getPropertyValue(measurement, value);
+        if (valStr) {
+            val = std::stoi(valStr);
+        }
+        multicore_fifo_push_blocking(val);
+    };
+
     for (auto measurement = json_getChild(measurements); measurement;
         measurement = json_getSibling(measurement)) {
         multicore_fifo_push_blocking(static_cast<uint32_t>(mini_lcd::Message::Type::Measurements));
         if (json_getType(measurement) == JSON_OBJ) {
             auto time = json_getPropertyValue(measurement, "time");
-            for (int i=0; i<16; ++i) {
+            for (int i = 0; i < 16; ++i) {
                 std::string cpuName = "CPU" + std::to_string(i);
-                auto cpuVal = json_getPropertyValue(measurement, cpuName.c_str());
-                uint32_t cpuValInt = 0;
-                if (cpuVal) {
-                    cpuValInt = std::stoi(cpuVal);
-                }
-                multicore_fifo_push_blocking(cpuValInt);
+                parseAndSend(measurement, cpuName.c_str());
             }
-            auto gpu = json_getPropertyValue(measurement, "GPU");
-            uint32_t gpuVal = 0;
-            if (gpu) {
-                gpuVal = std::stoi(gpu);
-            }
-            multicore_fifo_push_blocking(gpuVal);
+            parseAndSend(measurement, "RAM");
+            parseAndSend(measurement, "GPU");
+            parseAndSend(measurement, "GPUVD");
+            parseAndSend(measurement, "GPUVE");
+            parseAndSend(measurement, "GPUMEM");
         }
     }
 
