@@ -22,11 +22,30 @@ public:
 
     void put_pixel(int16_t x0, int16_t y0, hagl_color_t color);
 
-    void hline(int16_t x0, int16_t y0, uint16_t width, hagl_color_t color);
-
-    void vline(int16_t x0, int16_t y0, uint16_t height, hagl_color_t color);
+    void drawHlineInner(int16_t x0, int16_t y0, uint16_t width, hagl_color_t color);
+    void drawVlineInner(int16_t x0, int16_t y0, uint16_t height, hagl_color_t color);
 
     void blit(int16_t x0, int16_t y0, hagl_bitmap_t* src);
+
+    void set_clip(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
+
+    // Drawing
+    uint8_t putChar(wchar_t code, int16_t x0, int16_t y0, hagl_color_t color, const unsigned char *font);
+    uint16_t text(const wchar_t *str, int16_t x0, int16_t y0, hagl_color_t color, const unsigned char *font);
+    void circle(int16_t x0, int16_t y0, int16_t r, hagl_color_t color, bool fill = false);
+    void ellipse(
+        int16_t x0, int16_t y0, int16_t a, int16_t b, hagl_color_t color, bool fill = false);
+    void hline(int16_t x0, int16_t y0, uint16_t width, hagl_color_t color);
+    void line(int16_t x0, int16_t y0, int16_t x1, int16_t y1, hagl_color_t color);
+    void pixel(int16_t x0, int16_t y0, hagl_color_t color);
+    void polygon(int16_t amount, int16_t* vertices, hagl_color_t color, bool fill = false);
+    void rectangle(
+        int16_t x0, int16_t y0, int16_t x1, int16_t y1, hagl_color_t color, bool fill = false);
+    void rounded_rectangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t r,
+        hagl_color_t color, bool fill = false);
+    void triangle(Display& display, int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2,
+        int16_t y2, hagl_color_t color, bool fill = false);
+    void vline(int16_t x0, int16_t y0, uint16_t height, hagl_color_t color);
 
 private:
     void write_command(const uint8_t command);

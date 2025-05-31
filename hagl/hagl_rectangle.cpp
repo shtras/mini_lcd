@@ -113,7 +113,7 @@ void hagl_fill_rectangle_xyxy(
 
     for (uint16_t i = 0; i < height; i++) {
         /* Already clipped so can call HAL directly. */
-        display.hline(x0, y0 + i, width, color);
+        display.drawHlineInner(x0, y0 + i, width, color);
     }
 }
 

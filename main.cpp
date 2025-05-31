@@ -212,7 +212,7 @@ void displayThread()
             perfGraph.AddData(*msg);
             perfGraph.Draw();
         }
-        sleep_ms(100);
+        //sleep_ms(100);
         auto currTime = millis();
 
         std::wstringstream ss;

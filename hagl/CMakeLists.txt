@@ -19,7 +19,6 @@ target_sources(hagl INTERFACE
     ${CMAKE_CURRENT_LIST_DIR}/hagl_bitmap.cpp
     ${CMAKE_CURRENT_LIST_DIR}/fontx.cpp
     ${CMAKE_CURRENT_LIST_DIR}/hsl.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/rgb565.cpp
     ${CMAKE_CURRENT_LIST_DIR}/rgb888.cpp
     ${CMAKE_CURRENT_LIST_DIR}/tjpgd.c
     ${CMAKE_CURRENT_LIST_DIR}/fonts.cpp

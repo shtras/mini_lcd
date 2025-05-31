@@ -62,5 +62,5 @@ void hagl_draw_vline_xyh(Display& display, int16_t x0, int16_t y0, uint16_t h, h
         height = height - (y0 + height - 1 - display.clip.y1);
     }
 
-    display.vline(x0, y0, height, color);
+    display.drawVlineInner(x0, y0, height, color);
 }

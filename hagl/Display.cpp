@@ -36,6 +36,8 @@ SPDX-License-Identifier: MIT
 #include "hagl_hal.h"
 #include "mipi_dcs.h"
 
+#include "hagl.h"
+
 #include <hardware/spi.h>
 #include <hardware/dma.h>
 #include <hardware/gpio.h>
@@ -412,12 +414,12 @@ void Display::put_pixel(int16_t x0, int16_t y0, hagl_color_t color)
     write_xy(x0, y0, (uint8_t*)&color);
 }
 
-void Display::hline(int16_t x0, int16_t y0, uint16_t width, hagl_color_t color)
+void Display::drawHlineInner(int16_t x0, int16_t y0, uint16_t width, hagl_color_t color)
 {
     fill_xywh(x0, y0, width, 1, &color);
 }
 
-void Display::vline(int16_t x0, int16_t y0, uint16_t height, hagl_color_t color)
+void Display::drawVlineInner(int16_t x0, int16_t y0, uint16_t height, hagl_color_t color)
 {
     fill_xywh(x0, y0, 1, height, &color);
 }
@@ -425,4 +427,93 @@ void Display::vline(int16_t x0, int16_t y0, uint16_t height, hagl_color_t color)
 void Display::blit(int16_t x0, int16_t y0, hagl_bitmap_t* src)
 {
     write_xywh(x0, y0, src->width, src->height, (uint8_t*)src->buffer);
+}
+
+uint8_t Display::putChar(
+    wchar_t code, int16_t x0, int16_t y0, hagl_color_t color, const unsigned char* font)
+{
+    return hagl_put_char(*this, code, x0, y0, color, font);
+}
+
+uint16_t Display::text(
+    const wchar_t* str, int16_t x0, int16_t y0, hagl_color_t color, const unsigned char* font)
+{
+    return hagl_put_text(*this, str, x0, y0, color, font);
+}
+
+void Display::circle(int16_t x0, int16_t y0, int16_t r, hagl_color_t color, bool fill)
+{
+    if (fill) {
+        hagl_fill_circle(*this, x0, y0, r, color);
+    } else {
+        hagl_draw_circle(*this, x0, y0, r, color);
+    }
+}
+
+void Display::ellipse(int16_t x0, int16_t y0, int16_t a, int16_t b, hagl_color_t color, bool fill)
+{
+    if (fill) {
+        hagl_fill_ellipse(*this, x0, y0, a, b, color);
+    } else {
+        hagl_draw_ellipse(*this, x0, y0, a, b, color);
+    }
+}
+
+void Display::hline(int16_t x0, int16_t y0, uint16_t width, hagl_color_t color)
+{
+    hagl_draw_hline_xyw(*this, x0, y0, width, color);
+}
+
+void Display::line(int16_t x0, int16_t y0, int16_t x1, int16_t y1, hagl_color_t color)
+{
+    hagl_draw_line(*this, x0, y0, x1, y1, color);
+}
+
+void Display::pixel(int16_t x0, int16_t y0, hagl_color_t color)
+{
+    hagl_put_pixel(*this, x0, y0, color);
+}
+
+void Display::polygon(int16_t amount, int16_t* vertices, hagl_color_t color, bool fill)
+{
+    if (fill) {
+        hagl_fill_polygon(*this, amount, vertices, color);
+    } else {
+        hagl_draw_polygon(*this, amount, vertices, color);
+    }
+}
+
+void Display::rectangle(
+    int16_t x0, int16_t y0, int16_t x1, int16_t y1, hagl_color_t color, bool fill)
+{
+    if (fill) {
+        hagl_fill_rectangle_xyxy(*this, x0, y0, x1, y1, color);
+    } else {
+        hagl_draw_rectangle_xyxy(*this, x0, y0, x1, y1, color);
+    }
+}
+
+void Display::rounded_rectangle(
+    int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t r, hagl_color_t color, bool fill)
+{
+    if (fill) {
+        hagl_fill_rounded_rectangle_xyxy(*this, x0, y0, x1, y1, r, color);
+    } else {
+        hagl_draw_rounded_rectangle_xyxy(*this, x0, y0, x1, y1, r, color);
+    }
+}
+
+void Display::triangle(Display& display, int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2,
+    int16_t y2, hagl_color_t color, bool fill)
+{
+    if (fill) {
+        hagl_fill_triangle(display, x0, y0, x1, y1, x2, y2, color);
+    } else {
+        hagl_draw_triangle(display, x0, y0, x1, y1, x2, y2, color);
+    }
+}
+
+void Display::vline(int16_t x0, int16_t y0, uint16_t height, hagl_color_t color)
+{
+    hagl_draw_vline_xyh(*this, x0, y0, height, color);
 }

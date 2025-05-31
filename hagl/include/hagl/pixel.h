@@ -53,7 +53,6 @@ SPDX-License-Identifier: MIT
  * @param color
  */
 void hagl_put_pixel(Display& display, int16_t x0, int16_t y0, hagl_color_t color);
-void hagl_put_pixel(Display& display, int16_t x0, int16_t y0, hagl_color_t color);
 
 /**
  * Get a single pixel

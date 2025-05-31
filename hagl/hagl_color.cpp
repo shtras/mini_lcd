@@ -37,7 +37,3 @@ SPDX-License-Identifier: MIT
 #include "rgb565.h"
 #include "Display.h"
 
-hagl_color_t hagl_color(uint8_t r, uint8_t g, uint8_t b)
-{
-    return rgb565(r, g, b);
-}

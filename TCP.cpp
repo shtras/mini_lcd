@@ -137,6 +137,7 @@ err_t TCPTest::recv(tcp_pcb* arg, pbuf* buf, err_t err)
 
     tcp_recved(pcb, buf->tot_len);
     pbuf_free(buf);
+    std::cout << "Measurements sent to core 1\n";
     return close(0);
 }
 void TCPTest::error(err_t err)

@@ -62,5 +62,5 @@ void hagl_draw_hline_xyw(Display& display, int16_t x0, int16_t y0, uint16_t w, h
         width = width - (x0 + width - 1 - display.clip.x1);
     }
 
-    display.hline(x0, y0, width, color);
+    display.drawHlineInner(x0, y0, width, color);
 }
