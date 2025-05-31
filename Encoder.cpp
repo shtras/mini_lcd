@@ -6,17 +6,17 @@ static std::map<uint, mini_lcd::Encoder*> encoder_map;
 
 namespace mini_lcd
 {
-Encoder::Encoder(uint pinA, uint pinB, uint pinButton)
+Encoder::Encoder(uint pinA, uint pinB, uint pinButton, std::function<void(void)> onPress)
     : pinA_(pinA)
     , pinB_(pinB)
-    , pinButton_(pinButton)
 {
     gpio_set_dir(pinA_, GPIO_IN);
     gpio_set_dir(pinB_, GPIO_IN);
-    gpio_set_dir(pinButton_, GPIO_IN);
     gpio_pull_up(pinA_);
     gpio_pull_up(pinB_);
-    gpio_pull_up(pinButton_);
+    if (onPress) {
+        button_ = std::make_shared<Button>(pinButton, onPress);
+    }
 
     encoder_map[pinA_] = this;
     encoder_map[pinB_] = this;
@@ -40,6 +40,9 @@ void Encoder::process()
             }
         }
         directions_.pop_front();
+    }
+    if (button_) {
+        button_->Process();
     }
 }
 

@@ -16,7 +16,7 @@ namespace mini_lcd
 TCPTest::TCPTest()
 {
     if (cyw43_arch_init() != 0) {
-        std::cout << "cyw43 init failed!\n";
+        // std::cout << "cyw43 init failed!\n";
         return;
     }
     cyw43_arch_enable_sta_mode();
@@ -24,7 +24,7 @@ TCPTest::TCPTest()
 
 TCPTest::~TCPTest()
 {
-    std::cout << "Closing TCP client\n";
+    // std::cout << "Closing TCP client\n";
     cyw43_arch_deinit();
 }
 
@@ -32,10 +32,10 @@ bool TCPTest::connect()
 {
     if (cyw43_arch_wifi_connect_timeout_ms(
             WIFI_SSID, WIFI_PASSWORD, CYW43_AUTH_WPA2_AES_PSK, 30000)) {
-        std::cout << "failed to connect.\n";
+        // std::cout << "failed to connect.\n";
         return false;
     }
-    std::cout << "Connected.\n";
+    // std::cout << "Connected.\n";
     return true;
 }
 
@@ -48,7 +48,7 @@ void TCPTest::getMeasurements()
     ip4addr_aton(SERVER_ADDR, &remote_addr);
     pcb = tcp_new_ip_type(IP_GET_TYPE(&remote_addr));
     if (!pcb) {
-        std::cout << "Failed to create pcb\n";
+        // std::cout << "Failed to create pcb\n";
         return;
     }
 
@@ -61,49 +61,49 @@ void TCPTest::getMeasurements()
 
     cyw43_arch_lwip_begin();
     err_t err = tcp_connect(pcb, &remote_addr, 8700, tcp_client_connected);
-    std::cout << "Connecting to " << ip4addr_ntoa(&remote_addr) << " result: " << (int)err << "\n";
+    // std::cout << "Connecting to " << ip4addr_ntoa(&remote_addr) << " result: " << (int)err << "\n";
     cyw43_arch_lwip_end();
 }
 
 err_t TCPTest::poll(tcp_pcb* arg)
 {
-    std::cout << "Poll\n";
+    // std::cout << "Poll\n";
     return close(-1);
 }
 err_t TCPTest::sent(tcp_pcb* tpcb, u16_t len)
 {
-    std::cout << "Sent " << (int)len << "\n";
+    // std::cout << "Sent " << (int)len << "\n";
     return ERR_OK;
 }
 err_t TCPTest::recv(tcp_pcb* arg, pbuf* buf, err_t err)
 {
     if (!buf) {
-        std::cout << "TCP: Received empty buffer\n";
+        // std::cout << "TCP: Received empty buffer\n";
         return close(-1);
     }
-    std::cout << "TCP received " << (int)buf->len << " " << (int)buf->tot_len << "\n";
+    // std::cout << "TCP received " << (int)buf->len << " " << (int)buf->tot_len << "\n";
     //std::cout << std::string_view{(char*)buf->payload, buf->len} << "\n";
     auto jsonStr = std::string((char*)buf->payload, buf->len);
     auto jsonStartPos = jsonStr.find('{');
     if (jsonStartPos == std::string::npos) {
-        std::cout << "No JSON object found in response\n";
+        // std::cout << "No JSON object found in response\n";
         tcp_recved(pcb, buf->tot_len);
         pbuf_free(buf);
         return close(0);
     }
     jsonStr = jsonStr.substr(jsonStartPos);
-    std::cout << "JSON: " << jsonStr << "\n";
+    // std::cout << "JSON: " << jsonStr << "\n";
     json_t pool[128];
     auto parent = json_create((char*)jsonStr.c_str(), pool, sizeof pool / sizeof *pool);
     if (parent == nullptr) {
-        std::cout << "Failed to parse JSON\n";
+        // std::cout << "Failed to parse JSON\n";
         tcp_recved(pcb, buf->tot_len);
         pbuf_free(buf);
         return close(0);
     }
     auto measurements = json_getProperty(parent, "measurements");
     if (!measurements || json_getType(measurements) != JSON_ARRAY) {
-        std::cout << "No measurements found in JSON\n";
+        // std::cout << "No measurements found in JSON\n";
         tcp_recved(pcb, buf->tot_len);
         pbuf_free(buf);
         return close(0);
@@ -137,12 +137,12 @@ err_t TCPTest::recv(tcp_pcb* arg, pbuf* buf, err_t err)
 
     tcp_recved(pcb, buf->tot_len);
     pbuf_free(buf);
-    std::cout << "Measurements sent to core 1\n";
+    // std::cout << "Measurements sent to core 1\n";
     return close(0);
 }
 void TCPTest::error(err_t err)
 {
-    std::cout << "TCP error " << (int)err << "\n";
+    // std::cout << "TCP error " << (int)err << "\n";
     close(-1);
 }
 err_t TCPTest::conn(tcp_pcb* arg, err_t err)
@@ -151,7 +151,6 @@ err_t TCPTest::conn(tcp_pcb* arg, err_t err)
         std::cout << "connect failed " << (int)err << "\n";
         return close(err);
     }
-    std::cout << "TCP Connected\n";
 
     std::stringstream ss;
     ss << "GET /measurements HTTP/1.1\r\n"
@@ -161,7 +160,7 @@ err_t TCPTest::conn(tcp_pcb* arg, err_t err)
     //std::cout << "Reporting: " << ss.str() << "\n";
 
     auto res = tcp_write(pcb, ss.str().data(), ss.str().size(), TCP_WRITE_FLAG_COPY);
-    std::cout << "Writing result: " << (int)res << "\n";
+    // std::cout << "Writing result: " << (int)res << "\n";
     return ERR_OK;
 }
 

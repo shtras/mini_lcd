@@ -1,8 +1,11 @@
 #pragma once
 
+#include "Button.h"
+
 #include "pico/stdlib.h"
 
 #include <list>
+#include <memory>
 #include <functional>
 
 namespace mini_lcd
@@ -10,7 +13,7 @@ namespace mini_lcd
 class Encoder
 {
 public:
-    Encoder(uint pinA, uint pinB, uint pinButton);
+    Encoder(uint pinA, uint pinB, uint pinButton, std::function<void(void)> onPress = nullptr);
     void process();
     void setOnLeft(std::function<void()> onLeft) { onLeft_ = onLeft; }
     void setOnRight(std::function<void()> onRight) { onRight_ = onRight; }
@@ -22,13 +25,13 @@ private:
 
     uint pinA_ = -1;
     uint pinB_ = -1;
-    uint pinButton_ = -1;
+    
+    std::shared_ptr<Button> button_ = nullptr;
 
     bool checkingDirection_ = false;
     std::list<Direction> directions_;
 
     std::function<void()> onLeft_ = nullptr;
     std::function<void()> onRight_ = nullptr;
-    std::function<void()> onButton_ = nullptr;
 };
 } // namespace mini_lcd
