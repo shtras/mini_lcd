@@ -20,6 +20,7 @@ find_package(nlohmann_json REQUIRED)
 add_executable(mini_lcd
         Button.cpp
         Encoder.cpp
+        Logger.cpp
         Snake.cpp
         Utils.cpp
         TCP.cpp

@@ -1,5 +1,6 @@
 #include "TCP.h"
 #include "Comm.h"
+#include "Logger.h"
 
 #include "tiny-json.h"
 
@@ -61,7 +62,7 @@ void TCPTest::getMeasurements()
 
     cyw43_arch_lwip_begin();
     err_t err = tcp_connect(pcb, &remote_addr, 8700, tcp_client_connected);
-    // std::cout << "Connecting to " << ip4addr_ntoa(&remote_addr) << " result: " << (int)err << "\n";
+    Logger::debug() << "Connecting to " << ip4addr_ntoa(&remote_addr) << " result: " << (int)err << "\n";
     cyw43_arch_lwip_end();
 }
 
@@ -81,29 +82,29 @@ err_t TCPTest::recv(tcp_pcb* arg, pbuf* buf, err_t err)
         // std::cout << "TCP: Received empty buffer\n";
         return close(-1);
     }
-    // std::cout << "TCP received " << (int)buf->len << " " << (int)buf->tot_len << "\n";
-    //std::cout << std::string_view{(char*)buf->payload, buf->len} << "\n";
+    Logger::debug() << "TCP received " << (int)buf->len << " " << (int)buf->tot_len << "\n";
+    Logger::trace() << std::string_view{(char*)buf->payload, buf->len} << "\n";
     auto jsonStr = std::string((char*)buf->payload, buf->len);
     auto jsonStartPos = jsonStr.find('{');
     if (jsonStartPos == std::string::npos) {
-        // std::cout << "No JSON object found in response\n";
+        Logger::warn() << "No JSON object found in response\n";
         tcp_recved(pcb, buf->tot_len);
         pbuf_free(buf);
         return close(0);
     }
     jsonStr = jsonStr.substr(jsonStartPos);
-    // std::cout << "JSON: " << jsonStr << "\n";
+    Logger::trace() << "JSON: " << jsonStr << "\n";
     json_t pool[128];
     auto parent = json_create((char*)jsonStr.c_str(), pool, sizeof pool / sizeof *pool);
     if (parent == nullptr) {
-        // std::cout << "Failed to parse JSON\n";
+        Logger::error() << "Failed to parse JSON\n";
         tcp_recved(pcb, buf->tot_len);
         pbuf_free(buf);
         return close(0);
     }
     auto measurements = json_getProperty(parent, "measurements");
     if (!measurements || json_getType(measurements) != JSON_ARRAY) {
-        // std::cout << "No measurements found in JSON\n";
+        Logger::warn() << "No measurements found in JSON\n";
         tcp_recved(pcb, buf->tot_len);
         pbuf_free(buf);
         return close(0);
@@ -137,12 +138,12 @@ err_t TCPTest::recv(tcp_pcb* arg, pbuf* buf, err_t err)
 
     tcp_recved(pcb, buf->tot_len);
     pbuf_free(buf);
-    // std::cout << "Measurements sent to core 1\n";
+    Logger::debug() << "Measurements sent to core 1\n";
     return close(0);
 }
 void TCPTest::error(err_t err)
 {
-    // std::cout << "TCP error " << (int)err << "\n";
+    Logger::error() << "TCP error " << (int)err << "\n";
     close(-1);
 }
 err_t TCPTest::conn(tcp_pcb* arg, err_t err)
@@ -157,7 +158,7 @@ err_t TCPTest::conn(tcp_pcb* arg, err_t err)
           "\r\n\r\n";
 
     auto res = tcp_write(pcb, ss.str().data(), ss.str().size(), TCP_WRITE_FLAG_COPY);
-    // std::cout << "Writing result: " << (int)res << "\n";
+    Logger::debug() << "TCP write result: " << (int)res << "\n";
     return ERR_OK;
 }
 
@@ -170,7 +171,7 @@ err_t TCPTest::close(int status)
     tcp_err(pcb, nullptr);
     auto res = tcp_close(pcb);
     if (res != ERR_OK) {
-        std::cout << "close failed " << (int)res << ", calling abort\n";
+        Logger::error() << "close failed " << (int)res << ", calling abort\n";
         tcp_abort(pcb);
         res = ERR_ABRT;
     }

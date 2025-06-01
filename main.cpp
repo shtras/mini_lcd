@@ -5,6 +5,7 @@
 #include "TCP.h"
 #include "Comm.h"
 #include "PerfGraph.h"
+#include "Logger.h"
 #include "ino_compat.h"
 
 #include <hagl_hal.h>
@@ -20,6 +21,8 @@
 #include <iomanip>
 #include <array>
 #include <sstream>
+
+using mini_lcd::Logger;
 
 void foo1(Display& display)
 {
@@ -214,28 +217,28 @@ void displayThread()
 void mainThread()
 {
     mini_lcd::Encoder encoder(20, 21, 22, []{
-        std::cout << "Encoder: Button pressed\n";
+        Logger::info() << "Encoder: Button pressed\n";
     });
-    mini_lcd::Encoder encoder1(26, 27, 28, []{
-        std::cout << "Encoder1: Button pressed\n";
+    mini_lcd::Encoder encoder1(4, 5, 28, []{
+        Logger::info() << "Encoder1: Button pressed\n";
     });
-    encoder.setOnLeft([]() { std::cout << "Encoder: Left\n"; });
-    encoder.setOnRight([]() { std::cout << "Encoder: Right\n"; });
-    encoder1.setOnLeft([]() { std::cout << "Encoder1: Left\n"; });
-    encoder1.setOnRight([]() { std::cout << "Encoder1: Right\n"; });
+    encoder.setOnLeft([]() { Logger::info() << "Encoder: Left\n"; });
+    encoder.setOnRight([]() { Logger::info() << "Encoder: Right\n"; });
+    encoder1.setOnLeft([]() { Logger::info() << "Encoder1: Left\n"; });
+    encoder1.setOnRight([]() { Logger::info() << "Encoder1: Right\n"; });
 
     // encoder.setOnLeft([&snake]() { snake.left(); });
     // encoder.setOnRight([&snake]() { snake.right(); });
 
     mini_lcd::Button button(18, []{
-        std::cout << "Button 18 up\n";
+        Logger::info() << "Button 18 up\n";
     }, []{
-        std::cout << "Button 18 down\n";
+        Logger::info() << "Button 18 down\n";
     });
     mini_lcd::Button button1(19, []{
-        std::cout << "Button 19 up\n";
+        Logger::info() << "Button 19 up\n";
     }, []{
-        std::cout << "Button 19 down\n";
+        Logger::info() << "Button 19 down\n";
     });
 
     Timestamp lastTime = millis();
@@ -260,7 +263,7 @@ int main()
 {
     stdio_init_all();
     sleep_ms(2000);
-    std::cout << "Start!\n";
+    Logger::info() << "Start!\n";
     multicore_launch_core1(displayThread);
     mainThread();
 }
