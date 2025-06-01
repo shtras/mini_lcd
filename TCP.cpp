@@ -7,8 +7,6 @@
 #include "pico/cyw43_arch.h"
 #include <pico/multicore.h>
 
-#include <plog/Log.h>
-
 #include <iostream>
 #include <sstream>
 #include <iomanip>
@@ -18,7 +16,7 @@ namespace mini_lcd
 TCPTest::TCPTest()
 {
     if (cyw43_arch_init() != 0) {
-        PLOG_ERROR << "cyw43 init failed!";
+        // std::cout << "cyw43 init failed!\n";
         return;
     }
     cyw43_arch_enable_sta_mode();
@@ -26,7 +24,7 @@ TCPTest::TCPTest()
 
 TCPTest::~TCPTest()
 {
-    PLOG_INFO << "Closing TCP client";
+    // std::cout << "Closing TCP client\n";
     cyw43_arch_deinit();
 }
 
@@ -34,10 +32,10 @@ bool TCPTest::connect()
 {
     if (cyw43_arch_wifi_connect_timeout_ms(
             WIFI_SSID, WIFI_PASSWORD, CYW43_AUTH_WPA2_AES_PSK, 30000)) {
-        PLOG_ERROR << "failed to connect.";
+        // std::cout << "failed to connect.\n";
         return false;
     }
-    PLOG_INFO << "Connected.";
+    // std::cout << "Connected.\n";
     return true;
 }
 
@@ -50,7 +48,7 @@ void TCPTest::getMeasurements()
     ip4addr_aton(SERVER_ADDR, &remote_addr);
     pcb = tcp_new_ip_type(IP_GET_TYPE(&remote_addr));
     if (!pcb) {
-        PLOG_ERROR << "Failed to create pcb";
+        // std::cout << "Failed to create pcb\n";
         return;
     }
 
@@ -63,49 +61,49 @@ void TCPTest::getMeasurements()
 
     cyw43_arch_lwip_begin();
     err_t err = tcp_connect(pcb, &remote_addr, 8700, tcp_client_connected);
-    PLOG_DEBUG << "Connecting to " << ip4addr_ntoa(&remote_addr) << " result: " << (int)err << "";
+    // std::cout << "Connecting to " << ip4addr_ntoa(&remote_addr) << " result: " << (int)err << "\n";
     cyw43_arch_lwip_end();
 }
 
 err_t TCPTest::poll(tcp_pcb* arg)
 {
-    PLOG_INFO << "TCP timeout...";
+    // std::cout << "Poll\n";
     return close(-1);
 }
 err_t TCPTest::sent(tcp_pcb* tpcb, u16_t len)
 {
-    PLOG_DEBUG << "Sent " << (int)len;
+    // std::cout << "Sent " << (int)len << "\n";
     return ERR_OK;
 }
 err_t TCPTest::recv(tcp_pcb* arg, pbuf* buf, err_t err)
 {
     if (!buf) {
-        PLOG_WARNING << "TCP: Received empty buffer";
+        // std::cout << "TCP: Received empty buffer\n";
         return close(-1);
     }
-    PLOG_DEBUG << "TCP received " << (int)buf->len << " " << (int)buf->tot_len;
-    PLOG_VERBOSE << std::string_view{(char*)buf->payload, buf->len};
+    // std::cout << "TCP received " << (int)buf->len << " " << (int)buf->tot_len << "\n";
+    //std::cout << std::string_view{(char*)buf->payload, buf->len} << "\n";
     auto jsonStr = std::string((char*)buf->payload, buf->len);
     auto jsonStartPos = jsonStr.find('{');
     if (jsonStartPos == std::string::npos) {
-        PLOG_WARNING << "No JSON object found in response";
+        // std::cout << "No JSON object found in response\n";
         tcp_recved(pcb, buf->tot_len);
         pbuf_free(buf);
         return close(0);
     }
     jsonStr = jsonStr.substr(jsonStartPos);
-    PLOG_VERBOSE << "JSON: " << jsonStr;
+    // std::cout << "JSON: " << jsonStr << "\n";
     json_t pool[128];
     auto parent = json_create((char*)jsonStr.c_str(), pool, sizeof pool / sizeof *pool);
     if (parent == nullptr) {
-        PLOG_WARNING << "Failed to parse JSON";
+        // std::cout << "Failed to parse JSON\n";
         tcp_recved(pcb, buf->tot_len);
         pbuf_free(buf);
         return close(0);
     }
     auto measurements = json_getProperty(parent, "measurements");
     if (!measurements || json_getType(measurements) != JSON_ARRAY) {
-        PLOG_WARNING << "No measurements found in JSON";
+        // std::cout << "No measurements found in JSON\n";
         tcp_recved(pcb, buf->tot_len);
         pbuf_free(buf);
         return close(0);
@@ -139,18 +137,18 @@ err_t TCPTest::recv(tcp_pcb* arg, pbuf* buf, err_t err)
 
     tcp_recved(pcb, buf->tot_len);
     pbuf_free(buf);
-    PLOG_DEBUG << "Measurements sent to core 1";
+    // std::cout << "Measurements sent to core 1\n";
     return close(0);
 }
 void TCPTest::error(err_t err)
 {
-    PLOG_ERROR << "TCP error " << (int)err;
+    // std::cout << "TCP error " << (int)err << "\n";
     close(-1);
 }
 err_t TCPTest::conn(tcp_pcb* arg, err_t err)
 {
     if (err != ERR_OK) {
-        PLOG_ERROR << "connect failed " << (int)err;
+        std::cout << "connect failed " << (int)err << "\n";
         return close(err);
     }
 
@@ -159,7 +157,7 @@ err_t TCPTest::conn(tcp_pcb* arg, err_t err)
           "\r\n\r\n";
 
     auto res = tcp_write(pcb, ss.str().data(), ss.str().size(), TCP_WRITE_FLAG_COPY);
-    PLOG_DEBUG << "TCP write result: " << (int)res;
+    // std::cout << "Writing result: " << (int)res << "\n";
     return ERR_OK;
 }
 
@@ -172,7 +170,7 @@ err_t TCPTest::close(int status)
     tcp_err(pcb, nullptr);
     auto res = tcp_close(pcb);
     if (res != ERR_OK) {
-        PLOG_ERROR << "close failed " << (int)res << ", calling abort";
+        std::cout << "close failed " << (int)res << ", calling abort\n";
         tcp_abort(pcb);
         res = ERR_ABRT;
     }

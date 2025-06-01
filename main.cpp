@@ -16,11 +16,6 @@
 #include <pico/multicore.h>
 #include <hardware/spi.h>
 
-#include <plog/Log.h>
-#include <plog/Init.h>
-#include <plog/Formatters/TxtFormatter.h>
-#include <plog/Appenders/ConsoleAppender.h>
-
 #include <iostream>
 #include <iomanip>
 #include <array>
@@ -218,20 +213,30 @@ void displayThread()
 
 void mainThread()
 {
-    mini_lcd::Encoder encoder(20, 21, 22, [] { PLOG_INFO << "Encoder: Button pressed"; });
-    mini_lcd::Encoder encoder1(4, 5, 28, [] { PLOG_INFO << "Encoder1: Button pressed"; });
-    encoder.setOnLeft([]() { PLOG_INFO << "Encoder: Left"; });
-    encoder.setOnRight([]() { PLOG_INFO << "Encoder: Right"; });
-    encoder1.setOnLeft([]() { PLOG_INFO << "Encoder1: Left"; });
-    encoder1.setOnRight([]() { PLOG_INFO << "Encoder1: Right"; });
+    mini_lcd::Encoder encoder(20, 21, 22, []{
+        std::cout << "Encoder: Button pressed\n";
+    });
+    mini_lcd::Encoder encoder1(26, 27, 28, []{
+        std::cout << "Encoder1: Button pressed\n";
+    });
+    encoder.setOnLeft([]() { std::cout << "Encoder: Left\n"; });
+    encoder.setOnRight([]() { std::cout << "Encoder: Right\n"; });
+    encoder1.setOnLeft([]() { std::cout << "Encoder1: Left\n"; });
+    encoder1.setOnRight([]() { std::cout << "Encoder1: Right\n"; });
 
     // encoder.setOnLeft([&snake]() { snake.left(); });
     // encoder.setOnRight([&snake]() { snake.right(); });
 
-    mini_lcd::Button button(
-        18, [] { PLOG_INFO << "Button 18 up"; }, [] { PLOG_INFO << "Button 18 down"; });
-    mini_lcd::Button button1(
-        19, [] { PLOG_INFO << "Button 19 up"; }, [] { PLOG_INFO << "Button 19 down"; });
+    mini_lcd::Button button(18, []{
+        std::cout << "Button 18 up\n";
+    }, []{
+        std::cout << "Button 18 down\n";
+    });
+    mini_lcd::Button button1(19, []{
+        std::cout << "Button 19 up\n";
+    }, []{
+        std::cout << "Button 19 down\n";
+    });
 
     Timestamp lastTime = millis();
     mini_lcd::TCPTest tcp;
@@ -255,9 +260,7 @@ int main()
 {
     stdio_init_all();
     sleep_ms(2000);
-    plog::ConsoleAppender<plog::TxtFormatter> consoleAppender;
-    plog::init(plog::info, &consoleAppender);
-    PLOG_INFO << "Application started";
+    std::cout << "Start!\n";
     multicore_launch_core1(displayThread);
     mainThread();
 }
