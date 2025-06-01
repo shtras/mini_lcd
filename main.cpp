@@ -16,6 +16,11 @@
 #include <pico/multicore.h>
 #include <hardware/spi.h>
 
+#include <plog/Log.h>
+#include <plog/Init.h>
+#include <plog/Formatters/TxtFormatter.h>
+#include <plog/Appenders/ConsoleAppender.h>
+
 #include <iostream>
 #include <iomanip>
 #include <array>
@@ -132,39 +137,6 @@ void texts(Display& display)
     }
 }
 
-bool checkingDirection = false;
-
-void irq_callback(uint gpio, uint32_t event)
-{
-    std::cout << "GPIO " << gpio << " event " << event << " ";
-    if (event & GPIO_IRQ_EDGE_RISE) {
-        std::cout << "Rise ";
-    }
-    if (event & GPIO_IRQ_EDGE_FALL) {
-        std::cout << "Fall ";
-    }
-    if (event & GPIO_IRQ_LEVEL_HIGH) {
-        std::cout << "High ";
-    }
-    if (event & GPIO_IRQ_LEVEL_LOW) {
-        std::cout << "Low ";
-    }
-    std::cout << "\n";
-    if (event == GPIO_IRQ_EDGE_RISE) {
-        checkingDirection = false;
-    }
-    if (event == GPIO_IRQ_EDGE_FALL) {
-        if (checkingDirection) {
-            if (gpio == 15) {
-                std::cout << "Right\n";
-            } else {
-                std::cout << "Left\n";
-            }
-        }
-        checkingDirection = true;
-    }
-}
-
 void colorTest(Display& display)
 {
     hagl_clear(display);
@@ -179,8 +151,7 @@ void colorTest(Display& display)
             auto colorIdx = (y * numX + x) % Color::colors.size();
             display.rectangle(x * width, y * height, (x + 1) * width - 1, (y + 1) * height - 1,
                 Color::colors[colorIdx], true);
-            display.text(
-                std::to_wstring(colorIdx).c_str(), x * width + 1, y * height + 1,
+            display.text(std::to_wstring(colorIdx).c_str(), x * width + 1, y * height + 1,
                 Color::WHITE, Fonts::font5x7);
         }
     }
@@ -212,7 +183,7 @@ void displayThread()
     hagl_clear(display1);
     hagl_clear(display2);
 
-    display2.rectangle(0, 0, display2.width - 1, display2.height - 1, Color::DARK_BROWN, true);
+    display2.rectangle(0, 0, display2.width, display2.height, Color::DARK_BROWN, true);
 
     colorTest(display1);
 
@@ -247,30 +218,20 @@ void displayThread()
 
 void mainThread()
 {
-    mini_lcd::Encoder encoder(20, 21, 22, []{
-        std::cout << "Encoder: Button pressed\n";
-    });
-    mini_lcd::Encoder encoder1(26, 27, 28, []{
-        std::cout << "Encoder1: Button pressed\n";
-    });
-    encoder.setOnLeft([]() { std::cout << "Encoder: Left\n"; });
-    encoder.setOnRight([]() { std::cout << "Encoder: Right\n"; });
-    encoder1.setOnLeft([]() { std::cout << "Encoder1: Left\n"; });
-    encoder1.setOnRight([]() { std::cout << "Encoder1: Right\n"; });
+    mini_lcd::Encoder encoder(20, 21, 22, [] { PLOG_INFO << "Encoder: Button pressed"; });
+    mini_lcd::Encoder encoder1(4, 5, 28, [] { PLOG_INFO << "Encoder1: Button pressed"; });
+    encoder.setOnLeft([]() { PLOG_INFO << "Encoder: Left"; });
+    encoder.setOnRight([]() { PLOG_INFO << "Encoder: Right"; });
+    encoder1.setOnLeft([]() { PLOG_INFO << "Encoder1: Left"; });
+    encoder1.setOnRight([]() { PLOG_INFO << "Encoder1: Right"; });
 
     // encoder.setOnLeft([&snake]() { snake.left(); });
     // encoder.setOnRight([&snake]() { snake.right(); });
 
-    mini_lcd::Button button(18, []{
-        std::cout << "Button 18 up\n";
-    }, []{
-        std::cout << "Button 18 down\n";
-    });
-    mini_lcd::Button button1(19, []{
-        std::cout << "Button 19 up\n";
-    }, []{
-        std::cout << "Button 19 down\n";
-    });
+    mini_lcd::Button button(
+        18, [] { PLOG_INFO << "Button 18 up"; }, [] { PLOG_INFO << "Button 18 down"; });
+    mini_lcd::Button button1(
+        19, [] { PLOG_INFO << "Button 19 up"; }, [] { PLOG_INFO << "Button 19 down"; });
 
     Timestamp lastTime = millis();
     mini_lcd::TCPTest tcp;
@@ -294,7 +255,9 @@ int main()
 {
     stdio_init_all();
     sleep_ms(2000);
-    std::cout << "Start!\n";
+    plog::ConsoleAppender<plog::TxtFormatter> consoleAppender;
+    plog::init(plog::info, &consoleAppender);
+    PLOG_INFO << "Application started";
     multicore_launch_core1(displayThread);
     mainThread();
 }

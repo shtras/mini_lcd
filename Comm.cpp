@@ -3,6 +3,8 @@
 #include <pico/stdlib.h>
 #include <pico/multicore.h>
 
+#include <plog/Log.h>
+
 #include <iostream>
 #include <cstring>
 
@@ -19,10 +21,10 @@ Message* Receiver::process()
         case State::Idle: {
             uint32_t val = multicore_fifo_pop_blocking();
             Message::Type type = static_cast<Message::Type>(val);
-            //std::cout << "Now receiving " << val << "\n";
+            // PLOG_VERBOSE << "Now receiving " << val;
             message_.type = type;
             if (Message::Size.count(type) == 0) {
-                std::cout << "Bad message type: " << val << "\n";
+                PLOG_ERROR << "Bad message type: " << val;
                 return nullptr;
             }
             toReceive_ = Message::Size.at(type);
@@ -34,9 +36,9 @@ Message* Receiver::process()
         }
         case State::Receiving: {
             message_.data[received_++] = multicore_fifo_pop_blocking();
-            //std::cout << "Received " << received_ << " out of " << toReceive_ << "\n";
+            // PLOG_VERBOSE << "Received " << received_ << " out of " << toReceive_;
             if (received_ >= toReceive_) {
-                //std::cout << "Final\n";
+                // PLOG_VERBOSE << "Final";
                 state_ = State::Idle;
                 received_ = 0;
                 return &message_;

@@ -34,7 +34,9 @@ target_compile_definitions(mini_lcd PRIVATE
 )
 
 target_include_directories(mini_lcd PRIVATE
-        ${CMAKE_CURRENT_LIST_DIR})
+        ${CMAKE_CURRENT_LIST_DIR}
+        plog/include
+        )
 
 target_compile_definitions(mini_lcd PRIVATE
         MIPI_DISPLAY_PIN_RST=-1
