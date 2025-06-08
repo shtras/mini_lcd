@@ -14,6 +14,7 @@ public:
     static Logger& info(std::source_location loc = std::source_location::current());
     static Logger& warn(std::source_location loc = std::source_location::current());
     static Logger& error(std::source_location loc = std::source_location::current());
+    static Logger& GetLogger();
     void SetVerbosity(Verbosity verbosity);
 
     template <typename T>
@@ -27,7 +28,6 @@ public:
 
 private:
     static const char* verbosityToString(Verbosity verbosity);
-    static Logger& GetLogger();
     static Logger& start(std::source_location& loc, Verbosity verbosity);
     Verbosity verbosity_ = Verbosity::Info;
     Verbosity lineVerbosity = Verbosity::Info;

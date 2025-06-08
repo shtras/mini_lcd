@@ -31,6 +31,7 @@ void colorTest(Display& display)
 
 std::vector<std::wstring> MainMenuItems = {
     L"Display functions",
+    L"Logger verbosity",
     L"Reboot",
     L"Cancel",
 };
@@ -49,6 +50,14 @@ std::vector<std::wstring> FunctionNames = {
     L"Misc Graph",
     L"Snake",
     L"Settings",
+};
+
+std::vector<std::wstring> LoggerVerbosityNames = {
+    L"Trace",
+    L"Debug",
+    L"Info",
+    L"Warn",
+    L"Error",
 };
 } // namespace
 
@@ -120,11 +129,11 @@ void System::OnMessage(Message& msg)
 void System::setDisplayFunction(int idx, Function function)
 {
     Logger::debug() << "Setting function " << static_cast<int>(function) << " on display " << idx
-                   << "\n";
+                    << "\n";
     Logger::debug() << "Current functions: " << static_cast<int>(displayFunctions[0]) << ", "
-                   << static_cast<int>(displayFunctions[1]) << ", "
-                   << static_cast<int>(displayFunctions[2]) << ", "
-                   << static_cast<int>(displayFunctions[3]) << "\n";
+                    << static_cast<int>(displayFunctions[1]) << ", "
+                    << static_cast<int>(displayFunctions[2]) << ", "
+                    << static_cast<int>(displayFunctions[3]) << "\n";
     if (function != Function::None) {
         for (int i = 0; i < 4; ++i) {
             if (displayFunctions[i] == function) {
@@ -205,12 +214,13 @@ void System::onMainMenuItem(int idx)
             showDisplayNames();
             break;
         case 1:
+            showVerbosityNames();
+            break;
+        case 2:
             watchdog_reboot(0, 0, 0);
             break;
         default:
-            setDisplayFunction(settingsDisplay_, lastSettingFunction_);
-            lastSettingFunction_ = Function::None;
-            settingsDisplay_ = -1;
+            closeSettings();
             break;
     }
 }
@@ -243,5 +253,25 @@ void System::showFunctionNames()
         selectedDisplay_ = -1;
     });
     menu_.SetItems(&FunctionNames);
+}
+
+void System::showVerbosityNames()
+{
+    menu_.SetOnSelect([this](int idx) {
+        if (idx < 0 || idx >= static_cast<int>(LoggerVerbosityNames.size())) {
+            Logger::error() << "Invalid verbosity index: " << idx << "\n";
+            return;
+        }
+        Logger::GetLogger().SetVerbosity(static_cast<Logger::Verbosity>(idx));
+        closeSettings();
+    });
+    menu_.SetItems(&LoggerVerbosityNames);
+}
+
+void System::closeSettings()
+{
+    setDisplayFunction(settingsDisplay_, lastSettingFunction_);
+    lastSettingFunction_ = Function::None;
+    settingsDisplay_ = -1;
 }
 } // namespace mini_lcd

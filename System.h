@@ -33,7 +33,9 @@ private:
     void showSettings();
     void showDisplayNames();
     void showFunctionNames();
+    void showVerbosityNames();
     void onMainMenuItem(int idx);
+    void closeSettings();
 
     std::array<Function, 4> displayFunctions = {
         Function::None, Function::None, Function::None, Function::None};
