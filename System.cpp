@@ -66,12 +66,11 @@ System::System()
     Encoder(20, 21, 22),
 }
 {
-    encoders_[0].SetOnLeft([]() { Logger::info() << "Encoder 0: Left\n"; });
-    encoders_[0].SetOnRight([]() { Logger::info() << "Encoder 0: Right\n"; });
+    encoders_[0].SetOnLeft([]() { Logger::debug() << "Encoder 0: Left\n"; });
+    encoders_[0].SetOnRight([]() { Logger::debug() << "Encoder 0: Right\n"; });
     encoders_[1].SetOnLeft([this]() { menu_.Up(); });
     encoders_[1].SetOnRight([this]() { menu_.Down(); });
     encoders_[1].SetOnPress([this]() {
-        Logger::info() << "Encoder 1: Press\n";
         if (displayFunctions[3] == Function::Settings) {
             menu_.Click();
         } else {
@@ -79,10 +78,10 @@ System::System()
         }
     });
 
-    buttons_[0].SetOnUp([] { Logger::info() << "Button 0 Up\n"; });
-    buttons_[1].SetOnUp([] { Logger::info() << "Button 1 Up\n"; });
-    buttons_[2].SetOnUp([] { Logger::info() << "Button 2 Up\n"; });
-    buttons_[3].SetOnUp([] { Logger::info() << "Button 3 Up\n"; });
+    buttons_[0].SetOnUp([] { Logger::debug() << "Button 0 Up\n"; });
+    buttons_[1].SetOnUp([] { Logger::debug() << "Button 1 Up\n"; });
+    buttons_[2].SetOnUp([] { Logger::debug() << "Button 2 Up\n"; });
+    buttons_[3].SetOnUp([] { Logger::debug() << "Button 3 Up\n"; });
 
     buttons_[2].SetOnDown([this] { snake_.Left(); });
     buttons_[3].SetOnDown([this] { snake_.Right(); });
@@ -120,6 +119,12 @@ void System::OnMessage(Message& msg)
 
 void System::setDisplayFunction(int idx, Function function)
 {
+    Logger::debug() << "Setting function " << static_cast<int>(function) << " on display " << idx
+                   << "\n";
+    Logger::debug() << "Current functions: " << static_cast<int>(displayFunctions[0]) << ", "
+                   << static_cast<int>(displayFunctions[1]) << ", "
+                   << static_cast<int>(displayFunctions[2]) << ", "
+                   << static_cast<int>(displayFunctions[3]) << "\n";
     if (function != Function::None) {
         for (int i = 0; i < 4; ++i) {
             if (displayFunctions[i] == function) {
@@ -200,7 +205,7 @@ void System::onMainMenuItem(int idx)
             showDisplayNames();
             break;
         case 1:
-            watchdog_reboot(0,0,0);
+            watchdog_reboot(0, 0, 0);
             break;
         default:
             setDisplayFunction(settingsDisplay_, lastSettingFunction_);
@@ -225,6 +230,9 @@ void System::showFunctionNames()
         if (idx < 0 || idx >= static_cast<int>(FunctionNames.size())) {
             Logger::error() << "Invalid function index: " << idx << "\n";
             return;
+        }
+        if (lastSettingFunction_ == static_cast<Function>(idx)) {
+            lastSettingFunction_ = Function::None;
         }
         setDisplayFunction(selectedDisplay_, static_cast<Function>(idx));
         if (selectedDisplay_ != settingsDisplay_) {

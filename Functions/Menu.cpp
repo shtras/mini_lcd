@@ -32,7 +32,10 @@ void Menu::Up()
     if (!items_ || items_->empty()) {
         return;
     }
-    selectedIndex_ = (selectedIndex_ - 1) % static_cast<int>(items_->size());
+    --selectedIndex_;
+    if (selectedIndex_ < 0) {
+        selectedIndex_ = static_cast<int>(items_->size()) - 1;
+    }
     draw();
 }
 
@@ -41,7 +44,7 @@ void Menu::Down()
     if (!items_ || items_->empty()) {
         return;
     }
-    selectedIndex_ = (selectedIndex_ + 1) % static_cast<int>(items_->size());
+    selectedIndex_ = (selectedIndex_ + 1) % items_->size();
     draw();
 }
 
