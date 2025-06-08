@@ -22,7 +22,7 @@ struct Message
 class Receiver
 {
 public:
-    Message* process();
+    Message* Process();
 
 private:
     enum class State { Idle, Receiving };

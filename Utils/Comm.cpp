@@ -11,7 +11,7 @@ namespace mini_lcd
 const std::map<Message::Type, int> Message::Size = {
     {Message::Type::Measurements, 21}, {Message::Type::Snake, 1}};
 
-Message* Receiver::process()
+Message* Receiver::Process()
 {
     if (!multicore_fifo_rvalid()) {
         return nullptr;

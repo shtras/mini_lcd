@@ -15,8 +15,9 @@ class Encoder
 public:
     Encoder(uint pinA, uint pinB, uint pinButton, std::function<void(void)> onPress = nullptr);
     void Process();
-    void setOnLeft(std::function<void()> onLeft) { onLeft_ = onLeft; }
-    void setOnRight(std::function<void()> onRight) { onRight_ = onRight; }
+    void SetOnLeft(std::function<void(void)> onLeft);
+    void SetOnRight(std::function<void(void)> onRight);
+    void SetOnPress(std::function<void(void)> onPress);
 
 private:
     enum class Direction { Left, Right };
@@ -25,7 +26,7 @@ private:
 
     uint pinA_ = -1;
     uint pinB_ = -1;
-    
+
     std::shared_ptr<Button> button_ = nullptr;
 
     bool checkingDirection_ = false;

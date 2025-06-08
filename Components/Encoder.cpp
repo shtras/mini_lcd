@@ -29,6 +29,25 @@ Encoder::Encoder(uint pinA, uint pinB, uint pinButton, std::function<void(void)>
     gpio_set_irq_enabled_with_callback(pinB_, GPIO_IRQ_EDGE_FALL, true, &Encoder::irq_callback);
 }
 
+void Encoder::SetOnLeft(std::function<void(void)> onLeft)
+{
+    onLeft_ = onLeft;
+}
+
+void Encoder::SetOnRight(std::function<void(void)> onRight)
+{
+    onRight_ = onRight;
+}
+
+void Encoder::SetOnPress(std::function<void(void)> onPress)
+{
+    if (button_) {
+        button_->SetOnDown(onPress);
+    } else {
+        button_ = std::make_shared<Button>(pinA_, nullptr, onPress);
+    }
+}
+
 void Encoder::Process()
 {
     while (!directions_.empty()) {

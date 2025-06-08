@@ -11,9 +11,9 @@ public:
     TCPTest();
     ~TCPTest();
 
-    bool connect();
+    bool Connect();
 
-    void getMeasurements();
+    void GetMeasurements();
 
 private:
     static err_t tcp_client_poll(void* p, tcp_pcb* arg)

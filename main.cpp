@@ -165,7 +165,7 @@ void displayThread()
     auto startTime = millis();
 
     while (1) {
-        auto msg = receiver.process();
+        auto msg = receiver.Process();
         if (msg) {
             system.OnMessage(*msg);
         }
@@ -177,14 +177,14 @@ void mainThread()
 {
     Timestamp lastTime = millis();
     mini_lcd::TCPTest tcp;
-    while (!tcp.connect())
+    while (!tcp.Connect())
         ;
 
     while (1) {
         Timestamp currentTime = millis();
         if (currentTime - lastTime > 5000) {
             lastTime = currentTime;
-            tcp.getMeasurements();
+            tcp.GetMeasurements();
         }
         mini_lcd::Sender::GetInstance().Process();
     }

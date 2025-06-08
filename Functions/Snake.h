@@ -14,8 +14,8 @@ public:
     void SetDisplay(Display* display);
 
     void Process();
-    void left();
-    void right();
+    void Left();
+    void Right();
 
 private:
     enum class Direction { Up, Down, Left, Right };

@@ -29,7 +29,7 @@ TCPTest::~TCPTest()
     cyw43_arch_deinit();
 }
 
-bool TCPTest::connect()
+bool TCPTest::Connect()
 {
     if (cyw43_arch_wifi_connect_timeout_ms(
             WIFI_SSID, WIFI_PASSWORD, CYW43_AUTH_WPA2_AES_PSK, 30000)) {
@@ -40,7 +40,7 @@ bool TCPTest::connect()
     return true;
 }
 
-void TCPTest::getMeasurements()
+void TCPTest::GetMeasurements()
 {
     if (reporting_) {
         return;

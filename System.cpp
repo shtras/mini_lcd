@@ -30,21 +30,28 @@ namespace mini_lcd
 System::System()
 :
 buttons_{
-    Button(18),
     Button(19),
     Button(26),
     Button(27),
+    Button(18),
 },
 encoders_{
-    Encoder(4, 5, 28),
-    Encoder(20, 21, 22)
+    Encoder(5, 4, 28),
+    Encoder(20, 21, 22),
 }
 {
-    encoders_[0].setOnLeft([]() { Logger::info() << "Encoder: Left\n"; });
-    encoders_[0].setOnRight([]() { Logger::info() << "Encoder: Right\n"; });
+    encoders_[0].SetOnLeft([]() { Logger::info() << "Encoder 0: Left\n"; });
+    encoders_[0].SetOnRight([]() { Logger::info() << "Encoder 0: Right\n"; });
+    encoders_[1].SetOnLeft([]() { Logger::info() << "Encoder 1: Left\n"; });
+    encoders_[1].SetOnRight([]() { Logger::info() << "Encoder 1: Right\n"; });
 
-    buttons_[2].SetOnDown([this] { snake_.left(); });
-    buttons_[3].SetOnDown([this] { snake_.right(); });
+    buttons_[0].SetOnUp([] { Logger::info() << "Button 0 Up\n"; });
+    buttons_[1].SetOnUp([] { Logger::info() << "Button 1 Up\n"; });
+    buttons_[2].SetOnUp([] { Logger::info() << "Button 2 Up\n"; });
+    buttons_[3].SetOnUp([] { Logger::info() << "Button 3 Up\n"; });
+
+    buttons_[2].SetOnDown([this] { snake_.Left(); });
+    buttons_[3].SetOnDown([this] { snake_.Right(); });
 }
 
 void System::Init(std::array<Display*, 4> displays)

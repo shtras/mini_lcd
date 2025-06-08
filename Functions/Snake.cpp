@@ -62,7 +62,7 @@ void Snake::Process()
     draw(nextHead);
 }
 
-void Snake::left()
+void Snake::Left()
 {
     if (gameOver_) {
         reset();
@@ -89,7 +89,7 @@ void Snake::left()
     }
 }
 
-void Snake::right()
+void Snake::Right()
 {
     if (gameOver_) {
         reset();
