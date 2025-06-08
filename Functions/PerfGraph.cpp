@@ -15,13 +15,11 @@ namespace
 {
 std::array<uint16_t, 16> colors = {Color::RED, Color::GREEN, Color::BLUE, Color::YELLOW,
     Color::CYAN, Color::MAGENTA, Color::ORANGE, Color::PURPLE, Color::PINK, Color::BROWN,
-    Color::DARK_GRAY, Color::DARK_GRAY, Color::DARK_GRAY, Color::DARK_GRAY,
-    Color::DARK_GRAY, Color::DARK_GRAY};
+    Color::DARK_GRAY, Color::DARK_GRAY, Color::DARK_GRAY, Color::DARK_GRAY, Color::DARK_GRAY,
+    Color::DARK_GRAY};
 }
 
-PerfGraph::PerfGraph(Display* cpuDisplay, Display* miscDisplay)
-    : cpuDisplay_(cpuDisplay)
-    , miscDisplay_(miscDisplay)
+PerfGraph::PerfGraph()
 {
     for (auto& point : cpuData_) {
         point.fill(0);
@@ -36,14 +34,34 @@ PerfGraph::PerfGraph(Display* cpuDisplay, Display* miscDisplay)
 
 void PerfGraph::SetCpuDisplay(Display* display)
 {
-    cpuDisplay_->rectangle(0, 0, display->width, display->height, Color::BLACK, true);
+    if (display) {
+        display->clear();
+        if (display == miscDisplay_) {
+            SetMiscDisplay(nullptr);
+        }
+    }
+    if (cpuDisplay_) {
+        cpuDisplay_->clear();
+    }
     cpuDisplay_ = display;
+    lastUpdate_ = 0;
+    Process();
 }
 
 void PerfGraph::SetMiscDisplay(Display* display)
 {
-    miscDisplay_->rectangle(0, 0, display->width, display->height, Color::BLACK, true);
+    if (display) {
+        display->clear();
+        if (display == cpuDisplay_) {
+            SetCpuDisplay(nullptr);
+        }
+    }
+    if (miscDisplay_) {
+        miscDisplay_->clear();
+    }
     miscDisplay_ = display;
+    lastUpdate_ = 0;
+    Process();
 }
 
 void PerfGraph::AddData(Message& msg)
@@ -159,7 +177,7 @@ void PerfGraph::drawMisc()
     }
 }
 
-void PerfGraph::Draw()
+void PerfGraph::Process()
 {
     Timestamp now = millis();
     if (now - lastUpdate_ < 1000) {

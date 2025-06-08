@@ -9,9 +9,8 @@
 
 namespace mini_lcd
 {
-Snake::Snake(Display* display)
-    : display_(display)
-    , width_(Display::width / 10)
+Snake::Snake()
+    : width_(Display::width / 10)
     , height_(Display::height / 10)
 {
     reset();

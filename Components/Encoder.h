@@ -14,7 +14,7 @@ class Encoder
 {
 public:
     Encoder(uint pinA, uint pinB, uint pinButton, std::function<void(void)> onPress = nullptr);
-    void process();
+    void Process();
     void setOnLeft(std::function<void()> onLeft) { onLeft_ = onLeft; }
     void setOnRight(std::function<void()> onRight) { onRight_ = onRight; }
 

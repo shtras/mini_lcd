@@ -8,12 +8,12 @@ namespace mini_lcd
 class PerfGraph
 {
 public:
-    explicit PerfGraph(Display* cpuDisplay, Display* miscDisplay);
+    PerfGraph();
     void SetCpuDisplay(Display* display);
     void SetMiscDisplay(Display* display);
     void AddData(Message& msg);
 
-    void Draw();
+    void Process();
 
 private:
     void drawCPU();

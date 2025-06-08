@@ -6,6 +6,8 @@
 #include "Utils/Logger.h"
 #include "Functions/Snake.h"
 #include "Functions/PerfGraph.h"
+#include "Functions/Menu.h"
+#include "System.h"
 #include "ino_compat.h"
 
 #include <hagl_hal.h>
@@ -134,26 +136,6 @@ void texts(Display& display)
     }
 }
 
-void colorTest(Display& display)
-{
-    hagl_clear(display);
-    constexpr auto width = 20;
-    constexpr auto height = 20;
-
-    constexpr auto numX = display.width / width;
-    constexpr auto numY = display.height / height;
-
-    for (int y = 0; y < numY; ++y) {
-        for (int x = 0; x < numX; ++x) {
-            auto colorIdx = (y * numX + x) % Color::colors.size();
-            display.rectangle(x * width, y * height, (x + 1) * width - 1, (y + 1) * height - 1,
-                Color::colors[colorIdx], true);
-            display.text(std::to_wstring(colorIdx).c_str(), x * width + 1, y * height + 1,
-                Fonts::font5x7, Color::WHITE);
-        }
-    }
-}
-
 void displayThread()
 {
     mini_lcd::Receiver receiver;
@@ -164,87 +146,31 @@ void displayThread()
     Display cpuDisplay(14, 11, 6, 7, spi1);
     Display display2(14, 11, 17, 16, spi1);
 
-    
+    mini_lcd::System system;
+
     mipi_display_spi_master_init();
-    
+
     cpuDisplay.init();
     miscDisplay.init();
     display1.init();
     display2.init();
-    
-    std::array<Display*, 4> displays = {&cpuDisplay, &miscDisplay, &display1, &display2};
-    
-    mini_lcd::PerfGraph perfGraph(&cpuDisplay, &miscDisplay);
-    mini_lcd::Snake snake(&display2);
 
-    int32_t iteration = 0;
+    cpuDisplay.clear();
+    miscDisplay.clear();
+    display1.clear();
+    display2.clear();
 
-    hagl_clear(cpuDisplay);
-    hagl_clear(miscDisplay);
-    hagl_clear(display1);
-    hagl_clear(display2);
-
-    display2.rectangle(0, 0, display2.width, display2.height, Color::DARK_BROWN, true);
-
-    colorTest(display1);
-
-    mini_lcd::Encoder encoder(20, 21, 22, [] { Logger::info() << "Encoder: Button pressed\n"; });
-    mini_lcd::Encoder encoder1(4, 5, 28, [] { Logger::info() << "Encoder1: Button pressed\n"; });
-    encoder.setOnLeft([]() { Logger::info() << "Encoder: Left\n"; });
-    encoder.setOnRight([]() { Logger::info() << "Encoder: Right\n"; });
-    encoder1.setOnLeft([]() { Logger::info() << "Encoder1: Left\n"; });
-    encoder1.setOnRight([]() { Logger::info() << "Encoder1: Right\n"; });
-
-    mini_lcd::Button button(
-        18, [&snake] { snake.right(); }, [] { Logger::info() << "Button 18 up\n"; });
-    mini_lcd::Button button1(
-        19,
-        [&displays] {
-            Logger::info() << "Button 19 down\n";
-            for (auto& display : displays) {
-                if (display->Enabled()) {
-                    display->rectangle(0, 0, display->width, display->height, Color::BLACK, true);
-                    display->Disable();
-                } else {
-                    display->Enable();
-                }
-            }
-        },
-        [] { Logger::info() << "Button 19 up\n"; });
-    mini_lcd::Button button2(
-        26, [] { Logger::info() << "Button 26 down\n"; },
-        [] { Logger::info() << "Button 26 up\n"; });
-    mini_lcd::Button button3(
-        27, [&snake] { snake.left(); }, [] { Logger::info() << "Button 27 up\n"; });
+    system.Init({&miscDisplay, &cpuDisplay, &display1, &display2});
 
     auto startTime = millis();
 
     while (1) {
         auto msg = receiver.process();
         if (msg) {
-            if (msg->type == mini_lcd::Message::Type::Measurements) {
-                perfGraph.AddData(*msg);
-                perfGraph.Draw();
-            }
+            system.OnMessage(*msg);
         }
-        //sleep_ms(100);
-        auto currTime = millis();
-        snake.Process();
-        button.Process();
-        button1.Process();
-        button2.Process();
-        button3.Process();
-        encoder.process();
-        encoder1.process();
-
-        std::wstringstream ss;
-        ss << "Running for: " << std::fixed << std::setprecision(2)
-           << (currTime - startTime) / 1000.0f << " s";
-        display1.text(ss.str().c_str(), 10, cpuDisplay.height / 1.5, Fonts::font5x7, Color::YELLOW,
-            Color::DARK_BLUE);
-
-        ++iteration;
-    };
+        system.Process();
+    }
 }
 
 void mainThread()

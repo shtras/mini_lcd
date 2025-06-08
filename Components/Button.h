@@ -15,6 +15,9 @@ public:
     Button(Button&&) = delete;
     Button& operator=(Button&&) = delete;
 
+    void SetOnUp(std::function<void(void)> onUp);
+    void SetOnDown(std::function<void(void)> onDown);
+
     void Process();
 
 private:

@@ -9,7 +9,7 @@ namespace mini_lcd
 class Snake
 {
 public:
-    Snake(Display* display);
+    Snake();
 
     void SetDisplay(Display* display);
 
@@ -19,7 +19,8 @@ public:
 
 private:
     enum class Direction { Up, Down, Left, Right };
-    struct Segment {
+    struct Segment
+    {
         int x;
         int y;
     };
@@ -30,7 +31,7 @@ private:
     void reset();
     void spawnApple();
 
-    Display* display_;
+    Display* display_ = nullptr;
     uint64_t last_time_ = Utils::millis();
     uint64_t speed_ = 200;
     Direction direction_ = Direction::Right;

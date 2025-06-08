@@ -29,7 +29,7 @@ Encoder::Encoder(uint pinA, uint pinB, uint pinButton, std::function<void(void)>
     gpio_set_irq_enabled_with_callback(pinB_, GPIO_IRQ_EDGE_FALL, true, &Encoder::irq_callback);
 }
 
-void Encoder::process()
+void Encoder::Process()
 {
     while (!directions_.empty()) {
         if (directions_.front() == Direction::Left) {

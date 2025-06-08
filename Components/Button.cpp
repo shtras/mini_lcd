@@ -17,6 +17,16 @@ Button::Button(int pin, std::function<void(void)> onDown, std::function<void(voi
     gpio_pull_up(pin_);
 }
 
+void Button::SetOnUp(std::function<void(void)> onUp)
+{
+    onUp_ = onUp;
+}
+
+void Button::SetOnDown(std::function<void(void)> onDown)
+{
+    onDown_ = onDown;
+}
+
 void Button::Process()
 {
     auto status = gpio_get(pin_);

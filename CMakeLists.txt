@@ -21,6 +21,7 @@ add_executable(mini_lcd
         Functions/Snake.cpp
         Functions/PerfGraph.cpp
         Functions/Menu.cpp
+        System.cpp
 
         Utils/CircleDeq.cpp
         Utils/Logger.cpp
@@ -68,6 +69,8 @@ target_compile_definitions(mini_lcd PRIVATE
 )
 
 target_link_libraries(mini_lcd mini_lcd_compiler_flags pico_stdlib hagl pico_multicore pico_cyw43_arch_lwip_threadsafe_background)
+
+# set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
 # create map/bin/hex file etc.
 pico_add_extra_outputs(mini_lcd)
