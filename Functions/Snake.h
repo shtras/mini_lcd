@@ -1,6 +1,6 @@
 #pragma once
 #include "Display.h"
-#include "Utils.h"
+#include "Utils/Utils.h"
 
 #include <list>
 
@@ -9,9 +9,11 @@ namespace mini_lcd
 class Snake
 {
 public:
-    Snake(Display& display);
+    Snake(Display* display);
 
-    void process();
+    void SetDisplay(Display* display);
+
+    void Process();
     void left();
     void right();
 
@@ -28,7 +30,7 @@ private:
     void reset();
     void spawnApple();
 
-    Display& display_;
+    Display* display_;
     uint64_t last_time_ = Utils::millis();
     uint64_t speed_ = 200;
     Direction direction_ = Direction::Right;

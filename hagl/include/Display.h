@@ -52,6 +52,7 @@ public:
     void triangle(Display& display, int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2,
         int16_t y2, hagl_color_t color, bool fill = false);
     void vline(int16_t x0, int16_t y0, uint16_t height, hagl_color_t color);
+    void clear();
 
 private:
     void write_command(const uint8_t command);

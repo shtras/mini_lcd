@@ -34,6 +34,18 @@ PerfGraph::PerfGraph(Display* cpuDisplay, Display* miscDisplay)
     }
 }
 
+void PerfGraph::SetCpuDisplay(Display* display)
+{
+    cpuDisplay_->rectangle(0, 0, display->width, display->height, Color::BLACK, true);
+    cpuDisplay_ = display;
+}
+
+void PerfGraph::SetMiscDisplay(Display* display)
+{
+    miscDisplay_->rectangle(0, 0, display->width, display->height, Color::BLACK, true);
+    miscDisplay_ = display;
+}
+
 void PerfGraph::AddData(Message& msg)
 {
     assert(msg.type == Message::Type::Measurements);

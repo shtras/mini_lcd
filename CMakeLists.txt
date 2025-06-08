@@ -18,16 +18,20 @@ target_compile_options(mini_lcd_compiler_flags INTERFACE "$<$<NOT:$<CONFIG:Debug
 find_package(nlohmann_json REQUIRED)
 
 add_executable(mini_lcd
-        CircleDeq.cpp
-        Button.cpp
-        Encoder.cpp
-        Logger.cpp
-        Snake.cpp
-        Utils.cpp
-        TCP.cpp
-        Comm.cpp
-        PerfGraph.cpp
-        tiny-json.c
+        Functions/Snake.cpp
+        Functions/PerfGraph.cpp
+        Functions/Menu.cpp
+
+        Utils/CircleDeq.cpp
+        Utils/Logger.cpp
+        Utils/Utils.cpp
+        Utils/TCP.cpp
+        Utils/Comm.cpp
+        Utils/tiny-json.c
+        
+        Components/Button.cpp
+        Components/Encoder.cpp
+        
         main.cpp
 )
 

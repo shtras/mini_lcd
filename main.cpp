@@ -1,11 +1,11 @@
 #include "Display.h"
-#include "Encoder.h"
-#include "Button.h"
-#include "Snake.h"
-#include "TCP.h"
-#include "Comm.h"
-#include "PerfGraph.h"
-#include "Logger.h"
+#include "Components/Encoder.h"
+#include "Components/Button.h"
+#include "Utils/TCP.h"
+#include "Utils/Comm.h"
+#include "Utils/Logger.h"
+#include "Functions/Snake.h"
+#include "Functions/PerfGraph.h"
 #include "ino_compat.h"
 
 #include <hagl_hal.h>
@@ -164,18 +164,18 @@ void displayThread()
     Display cpuDisplay(14, 11, 6, 7, spi1);
     Display display2(14, 11, 17, 16, spi1);
 
-    mini_lcd::PerfGraph perfGraph(&cpuDisplay, &miscDisplay);
-
+    
     mipi_display_spi_master_init();
-
+    
     cpuDisplay.init();
     miscDisplay.init();
     display1.init();
     display2.init();
-
+    
     std::array<Display*, 4> displays = {&cpuDisplay, &miscDisplay, &display1, &display2};
-
-    mini_lcd::Snake snake(display2);
+    
+    mini_lcd::PerfGraph perfGraph(&cpuDisplay, &miscDisplay);
+    mini_lcd::Snake snake(&display2);
 
     int32_t iteration = 0;
 
@@ -229,7 +229,7 @@ void displayThread()
         }
         //sleep_ms(100);
         auto currTime = millis();
-        snake.process();
+        snake.Process();
         button.Process();
         button1.Process();
         button2.Process();

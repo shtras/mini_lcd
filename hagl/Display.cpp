@@ -580,3 +580,11 @@ void Display::vline(int16_t x0, int16_t y0, uint16_t height, hagl_color_t color)
     }
     hagl_draw_vline_xyh(*this, x0, y0, height, color);
 }
+
+void Display::clear()
+{
+    if (!enabled_) {
+        return;
+    }
+    hagl_clear(*this);
+}

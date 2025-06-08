@@ -1,6 +1,6 @@
 #pragma once
 #include "Display.h"
-#include "Comm.h"
+#include "Utils/Comm.h"
 #include "ino_compat.h"
 
 namespace mini_lcd
@@ -9,6 +9,8 @@ class PerfGraph
 {
 public:
     explicit PerfGraph(Display* cpuDisplay, Display* miscDisplay);
+    void SetCpuDisplay(Display* display);
+    void SetMiscDisplay(Display* display);
     void AddData(Message& msg);
 
     void Draw();

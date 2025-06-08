@@ -2,7 +2,7 @@
 #include "Comm.h"
 #include "Logger.h"
 
-#include "tiny-json.h"
+#include "Utils/tiny-json.h"
 
 #include "pico/stdlib.h"
 #include "pico/cyw43_arch.h"
