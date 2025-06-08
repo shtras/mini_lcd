@@ -2,12 +2,6 @@
 #include "fonts.h"
 namespace mini_lcd
 {
-Menu::Menu(Display* display, std::function<int(void)> onSelect)
-    : display_(display)
-    , onSelect_(onSelect)
-{
-}
-
 void Menu::SetItems(std::vector<std::wstring>* items)
 {
     if (!items || items->empty()) {
@@ -28,20 +22,34 @@ void Menu::SetDisplay(Display* display)
     display_ = display;
 }
 
-void Menu::Up() {
+void Menu::SetOnSelect(std::function<void(int)> onSelect)
+{
+    onSelect_ = onSelect;
+}
+
+void Menu::Up()
+{
     if (!items_ || items_->empty()) {
         return;
     }
-    selectedIndex_ = (selectedIndex_ - 1) % items_->size();
+    selectedIndex_ = (selectedIndex_ - 1) % static_cast<int>(items_->size());
     draw();
 }
 
-void Menu::Down() {
+void Menu::Down()
+{
     if (!items_ || items_->empty()) {
         return;
     }
-    selectedIndex_ = (selectedIndex_ + 1) % items_->size();
+    selectedIndex_ = (selectedIndex_ + 1) % static_cast<int>(items_->size());
     draw();
+}
+
+void Menu::Click()
+{
+    if (onSelect_) {
+        onSelect_(selectedIndex_);
+    }
 }
 
 void Menu::draw()
@@ -54,7 +62,8 @@ void Menu::draw()
     for (int i = 0; i < static_cast<int>(items_->size()); ++i) {
         auto color = (i == selectedIndex_) ? Color::WHITE : Color::GRAY;
         auto bgColor = (i == selectedIndex_) ? Color::DARK_GRAY : Color::BLACK;
-        display_->text((*items_)[i].c_str(), 0, static_cast<int>(i * 10), Fonts::font5x7, color, bgColor);
+        display_->text(
+            (*items_)[i].c_str(), 0, static_cast<int>(i * 10), Fonts::font5x7, color, bgColor);
     }
 }
 } // namespace mini_lcd

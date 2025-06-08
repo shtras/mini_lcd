@@ -26,6 +26,7 @@ private:
 
     uint pinA_ = -1;
     uint pinB_ = -1;
+    uint pinButton_ = -1;
 
     std::shared_ptr<Button> button_ = nullptr;
 

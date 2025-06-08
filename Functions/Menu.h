@@ -10,9 +10,9 @@ namespace mini_lcd
 class Menu
 {
 public:
-    explicit Menu(Display* display, std::function<int(void)> onSelect = nullptr);
     void SetDisplay(Display* display);
     void SetItems(std::vector<std::wstring>* items);
+    void SetOnSelect(std::function<void(int)> onSelect);
 
     void Up();
     void Down();
@@ -22,7 +22,7 @@ private:
     void draw();
 
     Display* display_ = nullptr;
-    std::function<int(void)> onSelect_ = nullptr;
+    std::function<void(int)> onSelect_ = nullptr;
     std::vector<std::wstring>* items_ = nullptr;
     int selectedIndex_ = -1;
 };

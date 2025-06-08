@@ -3,6 +3,7 @@
 #include "Display.h"
 #include "Functions/PerfGraph.h"
 #include "Functions/Snake.h"
+#include "Functions/Menu.h"
 #include "Components/Button.h"
 #include "Components/Encoder.h"
 
@@ -22,9 +23,6 @@ enum class Function {
 class System
 {
 public:
-    std::array<Function, 4> DisplayFunctions = {
-        Function::None, Function::None, Function::None, Function::None};
-
     System();
     void Init(std::array<Display*, 4> displays);
     void Process();
@@ -32,12 +30,22 @@ public:
 
 private:
     void setDisplayFunction(int idx, Function finction);
+    void showSettings();
+    void showDisplayNames();
+    void showFunctionNames();
+    void onMainMenuItem(int idx);
 
+    std::array<Function, 4> displayFunctions = {
+        Function::None, Function::None, Function::None, Function::None};
     std::array<Display*, 4> displays_ = {nullptr, nullptr, nullptr, nullptr};
     PerfGraph perfGraph_;
     Snake snake_;
+    Menu menu_;
 
     std::array<Button, 4> buttons_;
     std::array<Encoder, 2> encoders_;
+    int settingsDisplay_ = -1;
+    Function lastSettingFunction_ = Function::None;
+    int selectedDisplay_ = -1;
 };
 } // namespace mini_lcd

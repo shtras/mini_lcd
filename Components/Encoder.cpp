@@ -13,6 +13,7 @@ namespace mini_lcd
 Encoder::Encoder(uint pinA, uint pinB, uint pinButton, std::function<void(void)> onPress)
     : pinA_(pinA)
     , pinB_(pinB)
+    , pinButton_(pinButton)
 {
     gpio_set_dir(pinA_, GPIO_IN);
     gpio_set_dir(pinB_, GPIO_IN);
@@ -41,10 +42,15 @@ void Encoder::SetOnRight(std::function<void(void)> onRight)
 
 void Encoder::SetOnPress(std::function<void(void)> onPress)
 {
+    if (!onPress) {
+        if (button_) {
+            button_.reset();
+        }
+    }
     if (button_) {
         button_->SetOnDown(onPress);
     } else {
-        button_ = std::make_shared<Button>(pinA_, nullptr, onPress);
+        button_ = std::make_shared<Button>(pinButton_, nullptr, onPress);
     }
 }
 
