@@ -93,10 +93,10 @@ void PerfGraph::drawCPU()
     std::wstring meanStr = L"Mean: " + std::to_wstring(static_cast<int>(mean)) + L" %";
     std::wstring bottom = L"Bottom: " + std::to_wstring(lastPoint[15]) + L" %";
 
-    disp->text(top.c_str(), 10, 10, Color::GREEN, Fonts::font5x8);
-    disp->text(median.c_str(), 10, 20, Color::GREEN, Fonts::font5x8);
-    disp->text(meanStr.c_str(), 10, 30, Color::GREEN, Fonts::font5x8);
-    disp->text(bottom.c_str(), 10, 40, Color::GREEN, Fonts::font5x8);
+    disp->text(top.c_str(), 10, 10, Fonts::font5x8, Color::GREEN);
+    disp->text(median.c_str(), 10, 20, Fonts::font5x8, Color::GREEN);
+    disp->text(meanStr.c_str(), 10, 30, Fonts::font5x8, Color::GREEN);
+    disp->text(bottom.c_str(), 10, 40, Fonts::font5x8, Color::GREEN);
 }
 
 void PerfGraph::drawMisc()
@@ -107,19 +107,19 @@ void PerfGraph::drawMisc()
     std::wstringstream ss;
     ss << "RAM: " << std::fixed << std::setprecision(2) << 64.0f - ramData_[lastIndex] / 1024.0f
        << " GB";
-    disp->text(ss.str().c_str(), 10, 10, Color::WHITE, Fonts::font5x8);
+    disp->text(ss.str().c_str(), 10, 10, Fonts::font5x8, Color::WHITE);
     ss.str(std::wstring());
     ss << "GPU: " << gpuData_[lastIndex] << " %";
-    disp->text(ss.str().c_str(), 10, 20, Color::WHITE, Fonts::font5x8);
+    disp->text(ss.str().c_str(), 10, 20, Fonts::font5x8, Color::WHITE);
     ss.str(std::wstring());
     ss << "GPUVD: " << gpuvd_ << " %";
-    disp->text(ss.str().c_str(), 10, 30, Color::WHITE, Fonts::font5x8);
+    disp->text(ss.str().c_str(), 10, 30, Fonts::font5x8, Color::WHITE);
     ss.str(std::wstring());
     ss << "GPUVE: " << gpuve_ << " %";
-    disp->text(ss.str().c_str(), 10, 40, Color::WHITE, Fonts::font5x8);
+    disp->text(ss.str().c_str(), 10, 40, Fonts::font5x8, Color::WHITE);
     ss.str(std::wstring());
     ss << "GPUMEM: " << std::fixed << std::setprecision(2) << gpumem_ / 1024.0 << " GB";
-    disp->text(ss.str().c_str(), 10, 50, Color::WHITE, Fonts::font5x8);
+    disp->text(ss.str().c_str(), 10, 50, Fonts::font5x8, Color::WHITE);
     ss.str(std::wstring());
 
     constexpr float stretchX = cpuDisplay_->width / 2 / static_cast<float>(kMaxMiscDataPoints + 1);

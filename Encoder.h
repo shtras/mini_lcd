@@ -1,10 +1,10 @@
 #pragma once
 
 #include "Button.h"
+#include "CircleDeq.h"
 
 #include "pico/stdlib.h"
 
-#include <list>
 #include <memory>
 #include <functional>
 
@@ -29,9 +29,12 @@ private:
     std::shared_ptr<Button> button_ = nullptr;
 
     bool checkingDirection_ = false;
-    std::list<Direction> directions_;
+    CircleDeq<Direction> directions_;
 
     std::function<void()> onLeft_ = nullptr;
     std::function<void()> onRight_ = nullptr;
+
+    bool cwFall_ = false;
+    bool ccwFall_ = false;
 };
 } // namespace mini_lcd

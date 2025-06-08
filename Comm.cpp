@@ -8,7 +8,8 @@
 
 namespace mini_lcd
 {
-const std::map<Message::Type, int> Message::Size = {{Message::Type::Measurements, 21}};
+const std::map<Message::Type, int> Message::Size = {
+    {Message::Type::Measurements, 21}, {Message::Type::Snake, 1}};
 
 Message* Receiver::process()
 {
@@ -45,5 +46,23 @@ Message* Receiver::process()
         }
     }
     return nullptr;
+}
+
+void Sender::Send(const Message& message)
+{
+    messages_.push_back(message);
+}
+
+void Sender::Process()
+{
+    if (messages_.empty()) {
+        return;
+    }
+    auto& message = messages_.front();
+    multicore_fifo_push_blocking(static_cast<uint32_t>(message.type));
+    for (int i = 0; i < Message::Size.at(message.type); ++i) {
+        multicore_fifo_push_blocking(message.data[i]);
+    }
+    messages_.pop_front();
 }
 } // namespace mini_lcd

@@ -30,7 +30,7 @@ private:
 
     Display& display_;
     uint64_t last_time_ = Utils::millis();
-    uint64_t speed_ = 500;
+    uint64_t speed_ = 200;
     Direction direction_ = Direction::Right;
 
     std::list<Segment> segments_;
@@ -40,5 +40,6 @@ private:
     const int blockWidth_ = 10;
     const int blockHeight_ = 10;
     bool directionChanged_ = false;
+    bool gameOver_ = true;
 };
 } // namespace mini_lcd

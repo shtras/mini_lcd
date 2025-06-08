@@ -110,18 +110,21 @@ err_t TCPTest::recv(tcp_pcb* arg, pbuf* buf, err_t err)
         return close(0);
     }
 
-    auto parseAndSend = [](const json_t* measurement, const char* value) {
+    Message msg;
+    msg.type = Message::Type::Measurements;
+    int idx = 0;
+
+    auto parseAndSend = [&msg, &idx](const json_t* measurement, const char* value) {
         uint32_t val = 0;
         auto valStr = json_getPropertyValue(measurement, value);
         if (valStr) {
             val = std::stoi(valStr);
         }
-        multicore_fifo_push_blocking(val);
+        msg.data[idx++] = val;
     };
 
     for (auto measurement = json_getChild(measurements); measurement;
         measurement = json_getSibling(measurement)) {
-        multicore_fifo_push_blocking(static_cast<uint32_t>(mini_lcd::Message::Type::Measurements));
         if (json_getType(measurement) == JSON_OBJ) {
             auto time = json_getPropertyValue(measurement, "time");
             for (int i = 0; i < 16; ++i) {
@@ -135,6 +138,7 @@ err_t TCPTest::recv(tcp_pcb* arg, pbuf* buf, err_t err)
             parseAndSend(measurement, "GPUMEM");
         }
     }
+    Sender::GetInstance().Send(msg);
 
     tcp_recved(pcb, buf->tot_len);
     pbuf_free(buf);

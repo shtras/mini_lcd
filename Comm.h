@@ -5,13 +5,14 @@
 #include <memory>
 #include <array>
 #include <optional>
+#include <list>
 
 namespace mini_lcd
 {
 
 struct Message
 {
-    enum class Type : uint32_t { Unknown, Measurements };
+    enum class Type : uint32_t { Unknown, Measurements, Snake };
     Type type = Type::Unknown;
     std::array<uint32_t, 32> data;
 
@@ -30,5 +31,20 @@ private:
     Message message_;
     int received_ = 0;
     int toReceive_ = 0;
+};
+
+class Sender
+{
+public:
+    static Sender& GetInstance()
+    {
+        static Sender instance;
+        return instance;
+    }
+    void Send(const Message& message);
+    void Process();
+private:
+    Sender() = default;
+    std::list<Message> messages_;
 };
 } // namespace mini_lcd

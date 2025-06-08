@@ -23,12 +23,12 @@ void Button::Process()
     if (status != status_) {
         status_ = status;
         if (status == 1) {
-            if (onDown_) {
-                onDown_();
-            }
-        } else {
             if (onUp_) {
                 onUp_();
+            }
+        } else {
+            if (onDown_) {
+                onDown_();
             }
         }
     }

@@ -20,6 +20,10 @@ public:
 
     void init();
 
+    void Disable();
+    void Enable();
+    bool Enabled() const;
+
     void put_pixel(int16_t x0, int16_t y0, hagl_color_t color);
 
     void drawHlineInner(int16_t x0, int16_t y0, uint16_t width, hagl_color_t color);
@@ -30,8 +34,10 @@ public:
     void set_clip(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
 
     // Drawing
-    uint8_t putChar(wchar_t code, int16_t x0, int16_t y0, hagl_color_t color, const unsigned char *font);
-    uint16_t text(const wchar_t *str, int16_t x0, int16_t y0, hagl_color_t color, const unsigned char *font);
+    uint8_t putChar(wchar_t code, int16_t x0, int16_t y0, const unsigned char* font,
+        hagl_color_t color, hagl_color_t bgColor = Color::BLACK);
+    uint16_t text(const wchar_t* str, int16_t x0, int16_t y0, const unsigned char* font,
+        hagl_color_t color, hagl_color_t bgColor = Color::BLACK);
     void circle(int16_t x0, int16_t y0, int16_t r, hagl_color_t color, bool fill = false);
     void ellipse(
         int16_t x0, int16_t y0, int16_t a, int16_t b, hagl_color_t color, bool fill = false);
@@ -49,21 +55,13 @@ public:
 
 private:
     void write_command(const uint8_t command);
-
     void write_data(const uint8_t* data, size_t length);
-
     void read_data(uint8_t* data, size_t length);
-
     void set_address_xyxy(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2);
-
     void set_address_xy(uint16_t x1, uint16_t y1);
-
     void spi_master_init();
-
     size_t fill_xywh(uint16_t x1, uint16_t y1, uint16_t w, uint16_t h, void* _color);
-
     size_t write_xywh(uint16_t x1, uint16_t y1, uint16_t w, uint16_t h, uint8_t* buffer);
-
     size_t write_xy(uint16_t x1, uint16_t y1, uint8_t* buffer);
 
     /* TODO: This most likely does not work with dma atm. */
@@ -81,4 +79,6 @@ private:
     uint16_t prev_x2_ = 0;
     uint16_t prev_y1_ = 0;
     uint16_t prev_y2_ = 0;
+
+    bool enabled_ = true;
 };

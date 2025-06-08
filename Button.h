@@ -9,6 +9,11 @@ class Button
 public:
     explicit Button(int pin, std::function<void(void)> onDown = nullptr,
         std::function<void(void)> onUp = nullptr);
+    
+    Button(const Button&) = delete;
+    Button& operator=(const Button&) = delete;
+    Button(Button&&) = delete;
+    Button& operator=(Button&&) = delete;
 
     void Process();
 

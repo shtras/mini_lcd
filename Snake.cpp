@@ -1,4 +1,7 @@
 #include "Snake.h"
+
+#include <fonts.h>
+
 #include <hagl_hal.h>
 #include <hagl.h>
 
@@ -20,6 +23,9 @@ void Snake::process()
     if (now - last_time_ < speed_) {
         return;
     }
+    if (gameOver_) {
+        return;
+    }
     directionChanged_ = false;
     last_time_ = now;
     Segment nextHead = performStep(segments_.front(), direction_);
@@ -28,7 +34,8 @@ void Snake::process()
         std::any_of(segments_.begin(), segments_.end(), [nextHead](const Segment& segment) {
             return nextHead.x == segment.x && nextHead.y == segment.y;
         })) {
-        reset();
+        gameOver_ = true;
+        display_.text(L"Game Over", 10, 10, Fonts::font5x7, hagl_color(255, 0, 0));
         return;
     }
 
@@ -46,6 +53,11 @@ void Snake::process()
 
 void Snake::left()
 {
+    if (gameOver_) {
+        reset();
+        gameOver_ = false;
+        return;
+    }
     if (directionChanged_) {
         return;
     }
@@ -68,6 +80,11 @@ void Snake::left()
 
 void Snake::right()
 {
+    if (gameOver_) {
+        reset();
+        gameOver_ = false;
+        return;
+    }
     if (directionChanged_) {
         return;
     }

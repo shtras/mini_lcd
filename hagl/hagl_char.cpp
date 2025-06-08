@@ -75,8 +75,8 @@ uint8_t hagl_get_glyph(
     return 0;
 }
 
-uint8_t hagl_put_char(
-    Display& display, wchar_t code, int16_t x0, int16_t y0, hagl_color_t color, const uint8_t* font)
+uint8_t hagl_put_char(Display& display, wchar_t code, int16_t x0, int16_t y0, hagl_color_t color,
+    const uint8_t* font, hagl_color_t bgColor)
 {
     static uint8_t* buffer = NULL;
 
@@ -105,7 +105,7 @@ uint8_t hagl_put_char(
             if (set) {
                 *(ptr++) = color;
             } else {
-                *(ptr++) = 0x0000;
+                *(ptr++) = bgColor;
             }
         }
         glyph.buffer += glyph.pitch;
@@ -122,7 +122,7 @@ uint8_t hagl_put_char(
  */
 
 uint16_t hagl_put_text(Display& display, const wchar_t* str, int16_t x0, int16_t y0,
-    hagl_color_t color, const unsigned char* font)
+    hagl_color_t color, const unsigned char* font, hagl_color_t bgColor)
 {
     wchar_t temp;
     uint8_t status;
@@ -140,7 +140,7 @@ uint16_t hagl_put_text(Display& display, const wchar_t* str, int16_t x0, int16_t
             x0 = 0;
             y0 += meta.height;
         } else {
-            x0 += hagl_put_char(display, temp, x0, y0, color, font);
+            x0 += hagl_put_char(display, temp, x0, y0, color, font, bgColor);
         }
     } while (*str != 0);
 

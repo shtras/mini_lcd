@@ -40,8 +40,6 @@ SPDX-License-Identifier: MIT
 
 #include "hagl/color.h"
 
-
-
 /**
  * Draw a single character
  *
@@ -58,8 +56,8 @@ SPDX-License-Identifier: MIT
  * @param font  pointer to a FONTX font
  * @return width of the drawn character
  */
-uint8_t
-hagl_put_char(Display& display, wchar_t code, int16_t x0, int16_t y0, hagl_color_t color, const unsigned char *font);
+uint8_t hagl_put_char(Display& display, wchar_t code, int16_t x0, int16_t y0, hagl_color_t color,
+    const unsigned char* font, hagl_color_t bgColor);
 
 /**
  * Draw a string
@@ -77,8 +75,8 @@ hagl_put_char(Display& display, wchar_t code, int16_t x0, int16_t y0, hagl_color
  * @param font pointer to a FONTX font
  * @return width of the drawn string
  */
-uint16_t
-hagl_put_text(Display& display, const wchar_t *str, int16_t x0, int16_t y0, hagl_color_t color, const unsigned char *font);
+uint16_t hagl_put_text(Display& display, const wchar_t* str, int16_t x0, int16_t y0,
+    hagl_color_t color, const unsigned char* font, hagl_color_t bgColor);
 
 /**
  * Extract a glyph into a bitmap
@@ -93,9 +91,7 @@ hagl_put_text(Display& display, const wchar_t *str, int16_t x0, int16_t y0, hagl
  * @param font Pointer to a FONTX font
  * @return Width of the drawn string
  */
-uint8_t
-hagl_get_glyph(Display& display, wchar_t code, hagl_color_t color, hagl_bitmap_t *bitmap, const uint8_t *font);
-
-
+uint8_t hagl_get_glyph(
+    Display& display, wchar_t code, hagl_color_t color, hagl_bitmap_t* bitmap, const uint8_t* font);
 
 #endif /* _HAGL_CHAR_H */
