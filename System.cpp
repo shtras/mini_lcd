@@ -49,6 +49,7 @@ std::vector<std::wstring> FunctionNames = {
     L"CPU Graph",
     L"Misc Graph",
     L"Snake",
+    L"Tetris",
     L"Settings",
 };
 
@@ -87,13 +88,21 @@ System::System()
         }
     });
 
-    buttons_[0].SetOnUp([] { Logger::debug() << "Button 0 Up\n"; });
-    buttons_[1].SetOnUp([] { Logger::debug() << "Button 1 Up\n"; });
-    buttons_[2].SetOnUp([] { Logger::debug() << "Button 2 Up\n"; });
-    buttons_[3].SetOnUp([] { Logger::debug() << "Button 3 Up\n"; });
+    buttons_[0].SetOnUp([] { Logger::info() << "Button 0 Up\n"; });
+    buttons_[1].SetOnUp([] { Logger::info() << "Button 1 Up\n"; });
+    buttons_[2].SetOnUp([] { Logger::info() << "Button 2 Up\n"; });
+    buttons_[3].SetOnUp([] { Logger::info() << "Button 3 Up\n"; });
 
-    buttons_[2].SetOnDown([this] { snake_.Left(); });
-    buttons_[3].SetOnDown([this] { snake_.Right(); });
+    buttons_[0].SetOnDown([this] { tetris_.Rotate(); });
+    buttons_[1].SetOnDown([this] { tetris_.Drop(); });
+    buttons_[2].SetOnDown([this] {
+        snake_.Left();
+        tetris_.Left();
+    });
+    buttons_[3].SetOnDown([this] {
+        snake_.Right();
+        tetris_.Right();
+    });
 }
 
 void System::Init(std::array<Display*, 4> displays)
@@ -101,8 +110,8 @@ void System::Init(std::array<Display*, 4> displays)
     displays_ = displays;
     setDisplayFunction(0, Function::MiscGraph);
     setDisplayFunction(1, Function::CPUGraph);
-    setDisplayFunction(2, Function::ColorTest);
-    setDisplayFunction(3, Function::Snake);
+    setDisplayFunction(2, Function::Tetris);
+    setDisplayFunction(3, Function::ColorTest);
 }
 
 void System::Process()
@@ -114,6 +123,7 @@ void System::Process()
         encoder.Process();
     }
     snake_.Process();
+    tetris_.Process();
 }
 
 void System::OnMessage(Message& msg)
@@ -167,6 +177,9 @@ void System::setDisplayFunction(int idx, Function function)
         case Function::Snake:
             snake_.SetDisplay(nullptr);
             break;
+        case Function::Tetris:
+            tetris_.SetDisplay(nullptr);
+            break;
         case Function::Settings:
             display->clear();
             break;
@@ -190,6 +203,9 @@ void System::setDisplayFunction(int idx, Function function)
             break;
         case Function::Snake:
             snake_.SetDisplay(display);
+            break;
+        case Function::Tetris:
+            tetris_.SetDisplay(display);
             break;
         case Function::Settings:
             lastSettingFunction_ = currentFunction;

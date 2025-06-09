@@ -3,11 +3,13 @@
 #include "Display.h"
 #include "Functions/PerfGraph.h"
 #include "Functions/Snake.h"
+#include "Functions/Tetris.h"
 #include "Functions/Menu.h"
 #include "Components/Button.h"
 #include "Components/Encoder.h"
 
 #include <array>
+#include <list>
 
 namespace mini_lcd
 {
@@ -17,6 +19,7 @@ enum class Function {
     CPUGraph,
     MiscGraph,
     Snake,
+    Tetris,
     Settings,
 };
 
@@ -42,6 +45,7 @@ private:
     std::array<Display*, 4> displays_ = {nullptr, nullptr, nullptr, nullptr};
     PerfGraph perfGraph_;
     Snake snake_;
+    Tetris tetris_;
     Menu menu_;
 
     std::array<Button, 4> buttons_;

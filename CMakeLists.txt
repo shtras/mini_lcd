@@ -21,8 +21,8 @@ add_executable(mini_lcd
         Functions/Snake.cpp
         Functions/PerfGraph.cpp
         Functions/Menu.cpp
-        System.cpp
-
+        Functions/Tetris.cpp
+        
         Utils/CircleDeq.cpp
         Utils/Logger.cpp
         Utils/Utils.cpp
@@ -33,6 +33,7 @@ add_executable(mini_lcd
         Components/Button.cpp
         Components/Encoder.cpp
         
+        System.cpp
         main.cpp
 )
 
