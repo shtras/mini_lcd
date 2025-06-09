@@ -64,9 +64,8 @@ void Menu::draw()
     display_->clear();
     for (int i = 0; i < static_cast<int>(items_->size()); ++i) {
         auto color = (i == selectedIndex_) ? Color::WHITE : Color::GRAY;
-        auto bgColor = (i == selectedIndex_) ? Color::DARK_GRAY : Color::BLACK;
-        display_->text(
-            (*items_)[i].c_str(), 0, static_cast<int>(i * 10), Fonts::font5x7, color, bgColor);
+        auto bgColor = (i == selectedIndex_) ? Color::GRAY : Color::BLACK;
+        display_->text((*items_)[i].c_str(), 10, (i + 1) * 10, Fonts::font6x9, color, bgColor);
     }
 }
 } // namespace mini_lcd

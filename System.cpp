@@ -80,7 +80,7 @@ System::System()
     encoders_[1].SetOnLeft([this]() { menu_.Up(); });
     encoders_[1].SetOnRight([this]() { menu_.Down(); });
     encoders_[1].SetOnPress([this]() {
-        if (displayFunctions[3] == Function::Settings) {
+        if (settingsDisplay_ != -1 && displayFunctions[settingsDisplay_] == Function::Settings) {
             menu_.Click();
         } else {
             setDisplayFunction(3, Function::Settings);
@@ -128,6 +128,10 @@ void System::OnMessage(Message& msg)
 
 void System::setDisplayFunction(int idx, Function function)
 {
+    if (idx < 0 || idx > 3) {
+        Logger::error() << "Invalid display index: " << idx << "\n";
+        return;
+    }
     Logger::debug() << "Setting function " << static_cast<int>(function) << " on display " << idx
                     << "\n";
     Logger::debug() << "Current functions: " << static_cast<int>(displayFunctions[0]) << ", "
@@ -244,12 +248,8 @@ void System::showFunctionNames()
         if (lastSettingFunction_ == static_cast<Function>(idx)) {
             lastSettingFunction_ = Function::None;
         }
+        closeSettings();
         setDisplayFunction(selectedDisplay_, static_cast<Function>(idx));
-        if (selectedDisplay_ != settingsDisplay_) {
-            setDisplayFunction(settingsDisplay_, lastSettingFunction_);
-            lastSettingFunction_ = Function::None;
-            settingsDisplay_ = -1;
-        }
         selectedDisplay_ = -1;
     });
     menu_.SetItems(&FunctionNames);
